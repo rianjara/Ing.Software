@@ -8,5 +8,5 @@ import datetime
 
 def current_datetime(request):
     now = datetime.datetime.now()
-    html = "<html><body>It's now %s</body></html>" %now
+    html = "<html><body>la hora de ahora es: %s</body></html>" %now
     return HttpResponse(html)
