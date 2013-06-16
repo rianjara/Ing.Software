@@ -1,10 +1,13 @@
-from django.conf.urls import patterns, include, url
+#ORIGINAL from django.conf.urls import patterns, include, url
+from django.conf.urls.defaults import *
+from WebApplication.views import datetime, current_datetime
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+                       r'^time/$', current_datetime,
     # Examples:
     # url(r'^$', 'WebApplication.views.home', name='home'),
     # url(r'^WebApplication/', include('WebApplication.foo.urls')),
