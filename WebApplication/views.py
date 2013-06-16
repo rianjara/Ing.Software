@@ -1,12 +1,9 @@
-'''
-Created on 15/06/2013
-
-@author: Richard Jara
-'''
 from django.http import HttpResponse
 import datetime
+def hello(request):
+    return HttpResponse("Hello world")
 
 def current_datetime(request):
     now = datetime.datetime.now()
-    html = "<html><body>la hora de ahora es: %s</body></html>" %now
+    html = "<html><body> La hora e s: %s jojojo!! </bosy></html>" %now
     return HttpResponse(html)
