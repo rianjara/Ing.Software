@@ -12,19 +12,19 @@ class Cliente(object):
 
 
     def __init__(self, nombre, apellido1, apellido2, razonSocial = None, cedula, telefono = None, direccion = None, eMail = None):
-        '''
-        Constructor recibe como parámetros obligatorios:
-        -Nombre del cliente
-        -Primer Apellido del Cliente
-        -Segundo Apellido del Cliente
-        -Cédula
         
-        recibe como parámetros opcionales:
-        -Razón Social en caso de ser una empresa
-        -teléfono del cliente
-        -direccion del cliente o empresa
-        -e-mail *varios valores
-        '''
+        #Constructor recibe como parámetros obligatorios:
+        #-Nombre del cliente
+        #-Primer Apellido del Cliente
+        #-Segundo Apellido del Cliente
+        #-Cédula
+        
+        #recibe como parámetros opcionales:
+        #-Razón Social en caso de ser una empresa
+        #-teléfono del cliente
+        #-direccion del cliente o empresa
+        #-e-mail *varios valores
+        
         self.nombre = nombre
         self.apellido1 = apellido1
         self.apellido2 = apellido2
