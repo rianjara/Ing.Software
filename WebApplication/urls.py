@@ -1,7 +1,6 @@
 from django.conf.urls.defaults import *
 from django.contrib import admin
-from WebApplication.views import current_datetime, hello, style_flat_ui,\
-    style_bootstrap, clientes, fuente1, fuente2
+from WebApplication.views import current_datetime, hello, clientes
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
