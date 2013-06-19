@@ -7,12 +7,6 @@ from moduloClientes.models import Cliente
 def hello(request):
     return HttpResponse("Ola k ase... Programando en django o q ase? :B")
 
-def style_flat_ui(request):
-    return render_to_response('css/flat-ui.css',locals())
-
-def style_bootstrap(request):
-    return render_to_response('css/bootstrap.css',locals())
-
 def current_datetime(request):
     now = datetime.datetime.now()
     #Forma simple para usar plantillas desde sistema de archivo
@@ -27,9 +21,3 @@ def clientes(request):
     list_clientes = Cliente.objects.all()
     
     return render_to_response('dateapp/clientes.html',{'l_clienetes': list_clientes})
-
-def fuente1(request):
-    return render('fonts/Flat-UI-Icons.woff')
-
-def fuente2(request):
-    return render('fonts/Flat-UI-Icons.ttf')
