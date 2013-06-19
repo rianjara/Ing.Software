@@ -14,7 +14,11 @@ class Cliente(models.Model):
     ruc = models.CharField(max_length=15)
     
     def __str__(self):
-        return '%s %s %s' %(self.nombre,self.apellido1,self.apellido2)
+        return '\"<td>%s</td><td>%s %s %s</td><td>%s</td><td>%s</td><td>%s</td><td width=\"50\">"+btnEdit+btnElim+"</td>\"' %(self.cedula,self.nombre,self.apellido1,self.apellido2,self.telefonos,self.direccion,self.e_mail1)
+    #"<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>"
+    
+    def get_fields(self):
+        return  [(field.name, field.value) for field in Cliente._meta.fields]
         
     class Meta:
         ordering =["nombre"]

@@ -1,7 +1,8 @@
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.http import HttpResponse
 import datetime
 from django.template.loader import get_template
+from moduloClientes.models import Cliente
 
 def hello(request):
     return HttpResponse("Ola k ase... Programando en django o q ase? :B")
@@ -21,3 +22,14 @@ def current_datetime(request):
     #html = t.render(Context({'current_date': now}))
     #return HttpResponse(html)
     return render_to_response('dateapp/current_datetime.html',{'current_date': now})
+
+def clientes(request):
+    list_clientes = Cliente.objects.all()
+    
+    return render_to_response('dateapp/clientes.html',{'l_clienetes': list_clientes})
+
+def fuente1(request):
+    return render('fonts/Flat-UI-Icons.woff')
+
+def fuente2(request):
+    return render('fonts/Flat-UI-Icons.ttf')
