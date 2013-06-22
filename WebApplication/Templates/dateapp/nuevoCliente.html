@@ -1,0 +1,72 @@
+{% extends "base.html"%}
+
+{%block title%} Nuevo Cliente{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../clientes/" style="float: left;"><span class="fui-arrow-left"></span>Clientes</a>
+
+<h1>Nuevo Cliente</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+    <form action="/nuevo_cliente/" method="post">{% csrf_token %}
+    
+    	<div class="field">
+            {{ form.cedula.errors }}
+            <label for="id_cedula">Cedula:</label>
+            {{ form.cedula }}
+        </div>
+        <div class="field">
+            {{ form.nombre.errors }}
+            <label for="id_nombre">Nombre:</label>
+            {{ form.nombre }}
+        </div>        
+        <div class="field">
+            {{ form.apellido1.errors }}
+            <label for="id_apellido1">Apellido1:</label>
+            {{ form.apellido1 }}
+        </div>
+        <div class="field">
+            {{ form.apellido2.errors }}
+            <label for="id_apellido2">Apellido2:</label>
+            {{ form.apellido2 }}
+        </div>
+        <div class="field">
+            {{ form.fecha_nacimiento.errors }}
+            <label for="id_fecha_nacimiento">Fecha Nacimiento:</label>
+            {{ form.fecha_nacimiento }}
+        </div>
+        <div class="field">
+            {{ form.telefonos.errors }}
+            <label for="id_telefonos">Telefono:</label>
+            {{ form.telefonos }}
+        </div>        
+        <div class="field">
+            {{ form.direccion.errors }}
+            <label for="id_direccion">Direccion:</label>
+            {{ form.direccion }}
+        </div>        
+        <div class="field">
+            {{ form.e_mail1.errors }}
+            <label for="id_e_mail1">E-mail 1:</label>
+            {{ form.e_mail1 }}
+        </div>        
+        <div class="field">
+            {{ form.e_mail2.errors }}
+            <label for="id_e_mail2">E-mail 2:</label>
+            {{ form.e_mail2 }}
+        </div>        
+        <div class="field">
+            {{ form.ruc.errors }}
+            <label for="id_ruc">Ruc:</label>
+            {{ form.ruc }}
+        </div>
+        <input type="submit" value="Submit">
+    </form>
+   </div>
+{% endblock%}

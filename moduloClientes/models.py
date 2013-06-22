@@ -14,7 +14,7 @@ class Cliente(models.Model):
     ruc = models.CharField(max_length=15)
     
     def __str__(self):
-        return '\"<td>%s</td><td>%s %s %s</td><td>%s</td><td>%s</td><td>%s</td><td width=\"50\">"+btnEdit+btnElim+"</td>\"' %(self.cedula,self.nombre,self.apellido1,self.apellido2,self.telefonos,self.direccion,self.e_mail1)
+        return '%s %s' %(self.cedula,self.nombre)
     #"<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>"
     
     def get_fields(self):
