@@ -1,7 +1,6 @@
 from django.conf.urls.defaults import *
 from django.contrib import admin
-from WebApplication.views import current_datetime, hello, clientes,\
-    nuevo_cliente
+from WebApplication.views import *
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
@@ -12,6 +11,9 @@ urlpatterns = patterns('',
                        url(r'^time/$', current_datetime),
                        url(r'^hello/$', hello),
                        url(r'^clientes/$', clientes),
+                       #url(r'^client/(\d+)/$', 'view.buscar_cliente'),
+                       url(r'^busquedaClientes/$', buscar_form),
+                       (r'^search/$', buscar_cliente),
                        url(r'^nuevoCliente/$', nuevo_cliente),
                        url(r'^nuevo_cliente/$', nuevo_cliente),
     # Examples:
