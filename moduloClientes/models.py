@@ -25,3 +25,28 @@ class Cliente(models.Model):
                 
     class Admin():
         pass
+
+class Consultas(models.Model):
+    EYE_CHOICES = (('IZQUIERDO', 'Ojo Izquierdo'),('DERECHO', 'Ojo Derecho'),)
+    VISION_CHOICES = (('CERCA', 'Vision de Cerca'),('LEJOS', 'Vision de Lejos'),)
+    ESTADO_CHOICES=(('PENDIENTE', 'Consulta Pendiente'),('REALIZADA', 'Consulta Realizada'),('Proceso', 'Consulta en Proceso'),)
+    cliente=models.ForeignKey(Cliente)
+    esfera=models.DecimalField(max_digits=5,decimal_places=3)
+    cilindro=models.DecimalField(max_digits=5,decimal_places=3)
+    eje=models.IntegerField(max_length=4)
+    av=models.DecimalField(max_digits=5,decimal_places=3)
+    add=models.DecimalField(max_digits=5,decimal_places=3)
+    dp=models.DecimalField(max_digits=5,decimal_places=3)
+    fecha=models.DateField()
+    Diagnostico = models.CharField(max_length=200,null=True)
+    Observaciones = models.CharField(max_length=200,null=True)
+    vista = models.CharField(choices=VISION_CHOICES,max_length=15)
+    ojo = models.CharField(choices=EYE_CHOICES,max_length=15)      
+    estado = models.CharField(choices=ESTADO_CHOICES,max_length=15)
+    
+    class Meta:
+        ordering=["fecha"]
+        
+        
+        
+    
