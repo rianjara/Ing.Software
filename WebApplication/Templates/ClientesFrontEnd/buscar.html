@@ -1,0 +1,15 @@
+{% extends "base.html"%}
+
+{%block content%}
+<div class="container article" id="wrap">
+
+<a class="btn btn-primary" href="../clientes/" style="float: left;"><span class="fui-arrow-left"></span>Clientes</a>
+    {% if error %}
+        <p style="color: red;">Please submit a search term.</p>
+    {% endif %}
+    <form action="/search/" method="get">
+        <input type="text" name="q">
+        <input class="btn btn-primary" type="submit" value="Buscar">
+    </form>
+</div>
+{% endblock%}

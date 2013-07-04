@@ -1,0 +1,35 @@
+<!DOCTYPE>
+<html>
+<head>
+	<title>Sistema &Oacute;ptica - {% block title%}{% endblock%}</title>
+	<!-- Loading Bootstrap -->
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="../static/css/flat-ui.css" rel="stylesheet"></head>
+	<style>
+	body{
+		text-align:center; 
+		margin: auto; 
+		background-color:rgb(225,225,225);
+	}
+	.article{
+		-webkit-box-shadow: rgba(0,0,0,.7) 5px 5px 15px;
+		-moz-box-shadow: 5px 5px 10px rgba(0,0,0,.7);
+		box-shadow: 5px 5px 10px rgba(0,0,0,.7);
+		width:800px;
+		padding-top:50px; 
+		background-color:white; 
+		padding: 20px;
+	}
+	</style>
+	{% block jscript%}{% endblock%}
+</head>
+<body>
+	{% block content%}{% endblock%}
+	{% block footer%}
+	<hr>
+	<p>Sistema &Oacute;ptica</p>
+	{% endblock%}
+</body>
+</html>

@@ -1,0 +1,76 @@
+{% extends "base.html"%}
+
+{%block title%} Inicio{% endblock%}
+
+{% block content%}
+<style>
+	.article{
+		height: 700px;
+	}
+
+	.menu-icon{
+		float: left;
+		max-width: 256px;
+		max-height: 500px;
+		padding: 0;
+		margin: 0;
+	}
+
+	a{
+		text-decoration: none;
+	}
+
+	.menu-icon img{
+		transform: scale(0.5);
+		-ms-transform: scale(0.5); /* IE 9 */
+		-webkit-transform: scale(0.5); /* Safari and Chrome */
+	}
+</style>
+
+<div class="container article" id="wrap">
+		<h1>
+			Sistema &Oacute;ptica
+			<small>Men&uacute; Principal</small>
+		</h1>
+
+	<a href="../clientes/">
+		<div class="menu-icon">
+			<img src="../static/flat_miniset/admin.png">
+			<div class="tooltip fade bottom in">
+				<div class="tooltip-arrow" style></div>
+			<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Clientes</div>
+			</div>
+		</div>
+	</a>
+
+	<a href="../consultas/">
+		<div class="menu-icon">
+			<img src="../static/flat_miniset/clipboard.png">
+			<div class="tooltip fade bottom in">
+				<div class="tooltip-arrow" style></div>
+			<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Consulta</div>
+			</div>
+		</div>
+	</a>
+
+	<a href="">
+		<div class="menu-icon">
+			<img src="../static/flat_miniset/folder2.png">
+			<div class="tooltip fade bottom in">
+				<div class="tooltip-arrow" style></div>
+			<a href="../clientes/"><div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Historia Cl&iacute;nica</div></a>
+			</div>
+		</div>		
+	</a>
+
+	<a href="../inventario/">
+		<div class="menu-icon">
+			<img src="../static/flat_miniset/boxes.png">
+			<div class="tooltip fade bottom in">
+				<div class="tooltip-arrow" style></div>
+			<a href="../clientes/"><div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Inventario</div></a>
+			</div>
+		</div>
+	</a>
+</div>
+{% endblock%}
