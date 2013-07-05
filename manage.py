@@ -1,7 +1,14 @@
 #!/usr/bin/env python
 import os
 import sys
+"""
+import pydevd
 
+pydevd.patch_django_autoreload(
+patch_remote_debugger=False,  # Note that the remote debugger patch setting should be False on a regular run
+patch_show_console=True
+)
+"""
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "WebApplication.settings")
 
