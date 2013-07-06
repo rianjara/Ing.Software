@@ -7,7 +7,7 @@ from WebApplication.views import current_datetime, hello, index, error404
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
-# admin.autodiscover()
+admin.autodiscover()
 
 urlpatterns = patterns('',
                        #(r'^admin/',include('django.contrib.admin.urls')),

@@ -11,8 +11,8 @@ from django.db.utils import IntegrityError
 
 # Create your views here.
 
-def get_provider(pv_razon_social):
-    return Proveedor.objects.get(razon_social__exact=pv_razon_social)
+def get_provider(pv_id):
+    return Proveedor.objects.get(id=pv_id)
 
 def get_providers():
     return Proveedor.objects.all()
@@ -23,8 +23,8 @@ def get_providers_by_name(string):
 def get_providers_by_social_reason(string):
     return Proveedor.objects.filter(razon_social__icontains=string)
 
-def get_category(pv_name):
-    return Categoria.objects.get(nombre__exact=pv_name)
+def get_category(pv_id):
+    return Categoria.objects.get(id=pv_id)
 
 def get_categories():
     return Categoria.objects.all()
@@ -119,10 +119,14 @@ def inventario(request):
 
 def nuevo_item(request):
     if request.method == 'POST':
-        form = InventarioForm(request.POST)
+        form = NewItemForm(request.POST)
         if form.is_valid():
-            create_item(request.POST['codigo'], request.POST['nombre'], request.POST['descripcion'], request.POST['cantidad'], request.POST['costo_unitario'], request.POST['categoria'], request.POST['proveedor'])
-            return inventario(request)
+            print(request.POST['categoria'])
+            mensaje = create_item(request.POST['codigo'], request.POST['nombre'], request.POST['descripcion'], request.POST['cantidad'], request.POST['costo_unitario'], request.POST['categoria'], request.POST['proveedor'])
+            if mensaje.startswith("Operacion Exitosa."):
+                return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':mensaje})
+            else:
+                return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form,'mensaje':mensaje})
     else:
         if request.method != 'POST':
             form = NewItemForm()
@@ -170,7 +174,7 @@ class InventarioForm(forms.ModelForm):
 class NewItemForm(forms.ModelForm):   
     codigo = forms.CharField(help_text='Maximo 30 caracteres',required=True,max_length=30)
     nombre = forms.CharField(help_text='Maximo 50 caracteres',required=True,max_length=50)
-    descripcion = forms.CharField(help_text='Maximo 500 caracteres',required=True,max_length=500)
+    descripcion = forms.CharField(help_text='Maximo 500 caracteres',required=False,max_length=500)
     categoria = forms.ModelChoiceField(queryset=get_categories())
     proveedor = forms.ModelChoiceField(queryset=get_providers())
     costo_unitario = forms.FloatField(initial='0',required=True)
