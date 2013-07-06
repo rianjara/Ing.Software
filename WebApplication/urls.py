@@ -2,7 +2,7 @@ from django.conf.urls import *
 from django.contrib import admin
 from moduloClientes.views import buscar_form, clientes, buscar_cliente,\
     nuevo_cliente, editar_cliente, eliminar_cliente
-from moduloInventario.views import nuevo_item, inventario
+from moduloInventario.views import nuevo_item, inventario, editar_item, eliminar_item
 from WebApplication.views import current_datetime, hello, index, error404
 
 # Uncomment the next two lines to enable the admin:
@@ -23,8 +23,10 @@ urlpatterns = patterns('',
                        url(r'^editarCliente/$', editar_cliente),
                        url(r'^eliminarCliente/$', eliminar_cliente),
                        url(r'^index/$', index),
-                       url(r'^nuevoItem/$', nuevo_item),
                        url(r'^inventario/$', inventario),
+                       url(r'^nuevoItem/$', nuevo_item),
+                       url(r'^editarItem/$', editar_item),
+                       url(r'^eliminarItem/$', eliminar_item),
                        (r'^admin/', include(admin.site.urls)),
 )
 

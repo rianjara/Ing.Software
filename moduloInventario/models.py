@@ -45,6 +45,15 @@ class Item(models.Model):
     def __str__(self):
         return '%s'% (self.nombre)
     
+    def isActive(self):
+        return self.circulando
+    
+    def inactivate(self):
+        self.circulando=False
+    
+    def activate(self):
+        self.circulando=True
+    
     class Meta:
         db_table = 'Item'
         ordering = ['codigo']

@@ -8,11 +8,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
 from django import forms
 from django.db.utils import IntegrityError
+from django.http.response import HttpResponseRedirect
 
 # Create your views here.
 
 def get_provider(pv_id):
-    return Proveedor.objects.get(id=pv_id)
+    try:
+        return Proveedor.objects.get(id=pv_id)
+    except:
+        return None
 
 def get_providers():
     return Proveedor.objects.all()
@@ -66,22 +70,22 @@ def edit_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_costo,pb_circula
     item.save()
     return 'Operacion Exitosa. La informacion del item ha sido actualizada.'
 
-def get_item(pv_codigo):
-    return Item.objects.get(codigo__exact=pv_codigo)
+def get_item(pv_id):
+    return Item.objects.get(id=pv_id)
 
 def get_items_by_name(string):
-    return Item.objects.filter(nombre__icontains=string)
+    return Item.objects.filter(nombre__icontains=string,circulando=True)
 
 def get_items_by_code(string):
-    return Item.objects.filter(codigo__startswith=string)
+    return Item.objects.filter(codigo__startswith=string,circulando=True)
 
 def get_items_by_category(string):
-    return Item.objects.filter(categoria__nombre__exact=string)
+    return Item.objects.filter(categoria__nombre__exact=string,circulando=True)
 
 def search_items(string,search_type):
     list_item = None
     if None==search_type:
-        list_item = Item.objects.all()
+        list_item = Item.objects.filter(circulando=True)
     if "name"==search_type:
         list_item = get_items_by_name(string)
     elif "code"==search_type:
@@ -90,11 +94,18 @@ def search_items(string,search_type):
         list_item = get_items_by_category(string)
     return list_item
 
-def delete_item(pv_codigo):
-    l_item = get_item(pv_codigo)
-    l_item.b_circulando = False
-    l_item.save()
-    return "Operacion exitosa. Item con cdigo %s eliminado."%(pv_codigo)
+def delete_item(pv_id):
+    l_item = get_item(pv_id)
+    if None != l_item:
+        if l_item.circulando:
+            l_item.circulando = False
+            l_item.save()
+            print(l_item.circulando)
+            return "Operacion exitosa. Item %s eliminado."%(l_item.nombre)
+        else:
+            return "Operacion fallida. Item ya esta inactivo."
+    else:
+        return "Operacion fallida. Item no existe."
 
 def reduce_item(pv_codigo,pv_cantidad):
     l_item = get_item(pv_codigo)
@@ -126,7 +137,7 @@ def nuevo_item(request):
             if mensaje.startswith("Operacion Exitosa."):
                 return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':mensaje})
             else:
-                return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form,'mensaje':mensaje})
+                return render_to_response(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form,'mensaje':mensaje})
     else:
         if request.method != 'POST':
             form = NewItemForm()
@@ -154,10 +165,8 @@ def editar_item(request):
                 return inventario(request)
     return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form})
 
-def eliminar_item(request):        
-    i = Item.objects.get(pk=(request.GET['q']))
-    i.delete()
-    return inventario(request)
+def eliminar_item(request):
+    return render(request,'InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':delete_item(request.GET['q'])})
 
 class InventarioForm(forms.ModelForm):   
     codigo = forms.CharField(required=True,max_length=30)
