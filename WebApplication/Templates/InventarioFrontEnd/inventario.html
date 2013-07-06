@@ -76,12 +76,15 @@
 		</div>
 		<br>
         <a class="btn btn-primary btn-nuevo" href="../nuevoItem/"><span class="fui-plus"></span> Nuevo Item</a>
+        {% if None != mensaje %}
+        	<p id="mensaje" style="color: red;">{{ mensaje }}</p>
+        {% endif %}
         <br>
 		<div class="conatiner">
 			<table>
 				<thead>
 					<tr>
-						<th>Código</th><th>Item</th><th>Descripción</th><th>Proveedor</th><th>Costo</th><th>Cantidad</th>
+						<th>Codigo</th><th>Item</th><th>Descripcion</th><th>Proveedor</th><th>Costo</th><th>Cantidad</th>
 					</tr>
 				</thead>
 				<tbody id="items">

@@ -13,7 +13,9 @@
             Parece que olvido ingresar alguna informacion, por favor intentelo de nuevo.
         </p>
     {% endif %}
-
+	{% if None != mensaje %}
+    	<p id="mensaje" style="color: red;">{{ mensaje }}</p>
+    {% endif %}
     <form action="" method="post">{% csrf_token %}
     	<div class="field">
             {{ form.codigo.errors }}<label for="codigo">Codigo:</label>{{ form.codigo }}
