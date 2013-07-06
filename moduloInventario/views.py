@@ -8,7 +8,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
 from django import forms
 from django.db.utils import IntegrityError
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, HttpResponse
 
 # Create your views here.
 
@@ -166,7 +166,8 @@ def editar_item(request):
     return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form})
 
 def eliminar_item(request):
-    return render(request,'InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':delete_item(request.GET['q'])})
+    return HttpResponse(delete_item(request.GET['q']), content_type='text/plain')
+    #return render(request,'InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':delete_item(request.GET['q'])})
 
 class InventarioForm(forms.ModelForm):   
     codigo = forms.CharField(required=True,max_length=30)
