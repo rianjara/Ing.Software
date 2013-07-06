@@ -4,7 +4,7 @@ from django.db import models
 
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=200,null=False)
-    razon_social = models.CharField(max_length=200,null=False,primary_key=True)
+    razon_social = models.CharField(max_length=200,null=False,unique=True)
     ruc = models.CharField(max_length=20,null=False)
     telefono = models.CharField(max_length=20,null=True)
     
@@ -19,7 +19,7 @@ class Proveedor(models.Model):
         ordering = ['nombre']
     
 class Categoria(models.Model):
-    nombre = models.CharField(max_length=100,null=False,primary_key=True)
+    nombre = models.CharField(max_length=100,null=False,unique=True)
     descripcion = models.CharField(max_length=2000,null=True)
     
     def __unicode__(self):
@@ -33,13 +33,12 @@ class Categoria(models.Model):
         ordering = ['nombre']
 
 class Item(models.Model):
-    codigo = models.CharField(primary_key=True,max_length=30)
-    nombre = models.CharField(max_length=100)
-    descripcion = models.CharField(max_length=2000)
-    costo_unitario = models.FloatField()
-    cantidad = models.FloatField(default=0)
+    codigo = models.CharField(unique=True,max_length=30)
+    nombre = models.CharField(max_length=100,null=False)
+    descripcion = models.CharField(max_length=2000,null=True)
+    costo_unitario = models.FloatField(null=False)
+    cantidad = models.IntegerField(default=0,null=False)
     circulando = models.BooleanField(null=False)
-    
     proveedor = models.ForeignKey(Proveedor)
     categoria = models.ForeignKey(Categoria)
     

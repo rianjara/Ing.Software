@@ -4,42 +4,55 @@ from moduloInventario.models import Item, Proveedor, Categoria
 
 from django.core.context_processors import request
 from django.shortcuts import render_to_response, render
-
+from django.core.exceptions import ObjectDoesNotExist
 from django.forms import ModelForm
 from django import forms
+from django.db.utils import IntegrityError
 
 # Create your views here.
 
-def get_provider(pv_ruc):
-    return Proveedor.objects.get(v_ruc__exact=pv_ruc)
+def get_provider(pv_razon_social):
+    return Proveedor.objects.get(razon_social__exact=pv_razon_social)
 
 def get_providers():
     return Proveedor.objects.all()
 
 def get_providers_by_name(string):
-    return Proveedor.objects.filter(v_nombre__icontains=string)
+    return Proveedor.objects.filter(nombre__icontains=string)
 
 def get_providers_by_social_reason(string):
-    return Proveedor.objects.filter(v_razon_social__icontains=string)
+    return Proveedor.objects.filter(razon_social__icontains=string)
 
 def get_category(pv_name):
-    return Categoria.objects.get(v_nombre__exact=pv_name)
+    return Categoria.objects.get(nombre__exact=pv_name)
 
 def get_categories():
     return Categoria.objects.all()
 
 def get_categories_by_name(string):
-    return Categoria.objects.get(v_nombre__icontains=string)
+    return Categoria.objects.get(nombre__icontains=string)
 
-def create_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_valor,pv_categoria,pv_proveedor_ruc):
-    item = Item(v_codigo=pv_codigo,v_nombre=pv_nombre,v_descripcion=pv_descripcion,i_cantidad=pi_cantidad,f_costo_unitario=pf_valor,b_circulando=True)
-    item.categoria = get_category(pv_categoria)
-    item.proveedor = get_provider(pv_proveedor_ruc)
-    item.save()
-    return "Operacion Exitosa. El item se ha creado con exito."
+def create_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_valor,pv_categoria,pv_proveedor):
+        try:
+            item = Item(codigo=pv_codigo,nombre=pv_nombre,descripcion=pv_descripcion,cantidad=pi_cantidad,costo_unitario=pf_valor,circulando=True)
+            item.categoria = get_category(pv_categoria)
+            item.proveedor = get_provider(pv_proveedor)
+            item.save()
+        except IntegrityError,e:
+            return "Operacion Fallida. %s"%("Ya existe item con dicho codigo."if e.args[0].endswith('unique') else 'Algun campo requerido se ha enviado vacio.')
+        except ObjectDoesNotExist,e:
+            return "Operacion Fallida. %s no existe."%("Categoria"if e.args[0].startswith('Categoria') else 'Proveedor')
+        except ValueError:
+            return "Operacion Fallida. En algun campo se esta enviando un tipo de dato incorrecto."
+        else:
+            if None==item.id:
+                return "Operacion Fallida. El item no se ha podido insertar en la base."
+            else:
+                return "Operacion Exitosa. El item se ha creado con exito."
+        
 
-def edit_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_costo,pb_circulando,pv_categoria,pv_proveedor_ruc):
-    item = get_item(v_codigo=pv_codigo)
+def edit_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_costo,pb_circulando,pv_categoria,pv_proveedor):
+    item = get_item(codigo=pv_codigo)
     item.v_nombre = pv_nombre
     item.v_descripcion = pv_descripcion
     item.i_cantidad = pi_cantidad
@@ -49,21 +62,21 @@ def edit_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_costo,pb_circula
     else:
         item.b_circulando = False
     item.categoria = get_category(pv_categoria)
-    item.proveedor = get_provider(pv_proveedor_ruc)
+    item.proveedor = get_provider(pv_proveedor)
     item.save()
     return 'Operacion Exitosa. La informacion del item ha sido actualizada.'
 
 def get_item(pv_codigo):
-    return Item.objects.get(v_codigo__exact=pv_codigo)
+    return Item.objects.get(codigo__exact=pv_codigo)
 
 def get_items_by_name(string):
-    return Item.objects.filter(v_nombre__icontains=string)
+    return Item.objects.filter(nombre__icontains=string)
 
 def get_items_by_code(string):
-    return Item.objects.filter(v_codigo__startswith=string)
+    return Item.objects.filter(codigo__startswith=string)
 
 def get_items_by_category(string):
-    return Item.objects.filter(categoria__v_nombre__exact=string)
+    return Item.objects.filter(categoria__nombre__exact=string)
 
 def search_items(string,search_type):
     list_item = None
@@ -102,23 +115,18 @@ def raise_item(pv_codigo,pv_cantidad):
 
 
 def inventario(request):
-    lista_items = Item.objects.all()
-    
-    return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': lista_items})
+    return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None)})
 
 def nuevo_item(request):
     if request.method == 'POST':
         form = InventarioForm(request.POST)
         if form.is_valid():
-            i = Item(codigo=request.POST['codigo'],nombre=request.POST['nombre'],descripcion=request.POST['descripcion'],proveedor=request.POST['proveedor'],costo_unitario=request.POST['costo_unitario'],cantidad=request.POST['cantidad'])
-            i.save()
+            create_item(request.POST['codigo'], request.POST['nombre'], request.POST['descripcion'], request.POST['cantidad'], request.POST['costo_unitario'], request.POST['categoria'], request.POST['proveedor'])
             return inventario(request)
     else:
         if request.method != 'POST':
-            form = InventarioForm()
+            form = NewItemForm()
     return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form})
-    
-
 
 def editar_item(request):        
     i = Item.objects.get(pk=(request.GET['q']))
@@ -156,6 +164,17 @@ class InventarioForm(forms.ModelForm):
     costo_unitario = forms.FloatField(required=True)
     cantidad = forms.IntegerField(required=True)
     activo = forms.BooleanField(required=True)
+    class Meta:
+        model = Item
+
+class NewItemForm(forms.ModelForm):   
+    codigo = forms.CharField(help_text='Maximo 30 caracteres',required=True,max_length=30)
+    nombre = forms.CharField(help_text='Maximo 50 caracteres',required=True,max_length=50)
+    descripcion = forms.CharField(help_text='Maximo 500 caracteres',required=True,max_length=500)
+    categoria = forms.ModelChoiceField(queryset=get_categories())
+    proveedor = forms.ModelChoiceField(queryset=get_providers())
+    costo_unitario = forms.FloatField(initial='0',required=True)
+    cantidad = forms.IntegerField(initial='0',required=True)
     class Meta:
         model = Item
         
