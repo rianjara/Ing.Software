@@ -154,4 +154,11 @@ class CrearItem(TestCase):
         self.assertEqual(create_item('ln_006', 'Lentes para cerca', None, 'Cero', 45.89, 'Lentes', 'Ninguna'), 'Operacion Fallida. En algun campo se esta enviando un tipo de dato incorrecto.')
 
 
+class EliminarItem(TestCase):
+    def setUp(self):
+        Item.objects.create(codigo='ln_002',nombre='Lentes Bifocales 001',descripcion=None,cantidad=10,costo_unitario=47.50,circulando=True,categoria=Categoria.objects.get(nombre='Lentes'),proveedor=Proveedor.objects.get(nombre='Proveedor1'))
+        
+    def test_item_cp007(self):
+        delete_item(1)
+        item=get_item(1)
         self.assertEqual(item.circulando, False)
