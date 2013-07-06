@@ -154,4 +154,4 @@ class CrearItem(TestCase):
         self.assertEqual(create_item('ln_006', 'Lentes para cerca', None, 'Cero', 45.89, 'Lentes', 'Ninguna'), 'Operacion Fallida. En algun campo se esta enviando un tipo de dato incorrecto.')
 
 
-        
+        self.assertEqual(item.circulando, False)
