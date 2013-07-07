@@ -56,15 +56,17 @@ def create_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_valor,pv_categ
         
 
 def edit_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_costo,pb_circulando,pv_categoria,pv_proveedor):
-    item = get_item(codigo=pv_codigo)
-    item.v_nombre = pv_nombre
-    item.v_descripcion = pv_descripcion
-    item.i_cantidad = pi_cantidad
-    item.f_costo_unitario = pf_costo
-    if "SI"==pb_circulando:
+    item = get_item_by_code(pv_codigo)
+    item.codigo = pv_codigo
+    item.nombre = pv_nombre
+    item.descripcion = pv_descripcion
+    item.cantidad = pi_cantidad
+    item.costo_unitario = pf_costo
+    item.circulando = pb_circulando
+    """if "SI"==pb_circulando:
         item.b_circulando = True
     else:
-        item.b_circulando = False
+        item.b_circulando = False"""
     item.categoria = get_category(pv_categoria)
     item.proveedor = get_provider(pv_proveedor)
     item.save()
@@ -73,25 +75,28 @@ def edit_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_costo,pb_circula
 def get_item(pv_id):
     return Item.objects.get(id=pv_id)
 
-def get_items_by_name(string):
-    return Item.objects.filter(nombre__icontains=string,circulando=True)
+def get_item_by_code(pv_codigo):
+    return Item.objects.get(codigo=pv_codigo)
 
-def get_items_by_code(string):
-    return Item.objects.filter(codigo__startswith=string,circulando=True)
+def get_items_by_name(string,boolean):
+    return Item.objects.filter(nombre__icontains=string,circulando=True)if boolean else Item.objects.filter(nombre__icontains=string)
 
-def get_items_by_category(string):
-    return Item.objects.filter(categoria__nombre__exact=string,circulando=True)
+def get_items_by_code(string,boolean):
+    return Item.objects.filter(codigo__startswith=string,circulando=True)if boolean else Item.objects.filter(codigo__startswith=string)
 
-def search_items(string,search_type):
+def get_items_by_category(string,boolean):
+    return Item.objects.filter(categoria__nombre__exact=string,circulando=True)if boolean else Item.objects.filter(categoria__nombre__exact=string)
+
+def search_items(string,search_type,boolean):
     list_item = None
     if None==search_type:
-        list_item = Item.objects.filter(circulando=True)
+        list_item = Item.objects.filter(circulando=True) if boolean else Item.objects.all()
     if "name"==search_type:
-        list_item = get_items_by_name(string)
+        list_item = get_items_by_name(string,boolean)
     elif "code"==search_type:
-        list_item = get_items_by_code(string)
+        list_item = get_items_by_code(string,boolean)
     elif "category"==search_type:
-        list_item = get_items_by_category(string)
+        list_item = get_items_by_category(string,boolean)
     return list_item
 
 def delete_item(pv_id):
@@ -126,26 +131,25 @@ def raise_item(pv_codigo,pv_cantidad):
 
 
 def inventario(request):
-    return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None)})
+    return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None,False)})
 
 def nuevo_item(request):
     if request.method == 'POST':
-        form = NewItemForm(request.POST)
+        form = InventarioForm(request.POST)
         if form.is_valid():
             print(request.POST['categoria'])
             mensaje = create_item(request.POST['codigo'], request.POST['nombre'], request.POST['descripcion'], request.POST['cantidad'], request.POST['costo_unitario'], request.POST['categoria'], request.POST['proveedor'])
             if mensaje.startswith("Operacion Exitosa."):
-                return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':mensaje})
+                return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None,False),'mensaje':mensaje})
             else:
-                return render_to_response(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form,'mensaje':mensaje})
+                return render_to_response(request, 'InventarioFrontEnd/item.html', {'form': form,'mensaje':mensaje})
     else:
         if request.method != 'POST':
-            form = NewItemForm()
-    return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form})
+            form = InventarioForm()
+    return render(request, 'InventarioFrontEnd/item.html', {'form': form,'editing': False})
 
 def editar_item(request):        
     i = Item.objects.get(pk=(request.GET['q']))
-    
     if request.method != 'POST':
         form = InventarioForm(instance=i)
         form.id = request.GET['q']
@@ -154,20 +158,16 @@ def editar_item(request):
     else:
         if request.method == 'POST':
             form = InventarioForm(request.POST)
-            if form.is_valid():
-                i.codigo = request.POST['codigo']
-                i.nombre = request.POST['nombre']
-                i.descripcion = request.POST['descripcion']
-                i.proveedor = request.POST['proveedor']
-                i.costo_unitario = request.POST['costo_unitario']
-                i.cantidad = request.POST['cantidad']
-                i.save()
-                return inventario(request)
-    return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form})
+            try:
+                flag = request.POST['circulando']
+            except:
+                flag = False
+            mensaje = edit_item(request.POST['codigo'], request.POST['nombre'], request.POST['descripcion'], request.POST['cantidad'], request.POST['costo_unitario'], flag, request.POST['categoria'], request.POST['proveedor'])
+            return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None,False),'mensaje':mensaje})
+    return render(request, 'InventarioFrontEnd/item.html', {'form': form,'editing': True})
 
 def eliminar_item(request):
     return HttpResponse(delete_item(request.GET['q']), content_type='text/plain')
-    #return render(request,'InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':delete_item(request.GET['q'])})
 
 class InventarioForm(forms.ModelForm):   
     codigo = forms.CharField(required=True,max_length=30)
@@ -177,18 +177,7 @@ class InventarioForm(forms.ModelForm):
     proveedor = forms.ModelChoiceField(queryset=get_providers())
     costo_unitario = forms.FloatField(required=True)
     cantidad = forms.IntegerField(required=True)
-    activo = forms.BooleanField(required=True)
-    class Meta:
-        model = Item
-
-class NewItemForm(forms.ModelForm):   
-    codigo = forms.CharField(help_text='Maximo 30 caracteres',required=True,max_length=30)
-    nombre = forms.CharField(help_text='Maximo 50 caracteres',required=True,max_length=50)
-    descripcion = forms.CharField(help_text='Maximo 500 caracteres',required=False,max_length=500)
-    categoria = forms.ModelChoiceField(queryset=get_categories())
-    proveedor = forms.ModelChoiceField(queryset=get_providers())
-    costo_unitario = forms.FloatField(initial='0',required=True)
-    cantidad = forms.IntegerField(initial='0',required=True)
+    activo = forms.BooleanField(required=False,initial=True)
     class Meta:
         model = Item
         

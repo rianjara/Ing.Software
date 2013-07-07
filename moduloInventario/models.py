@@ -53,6 +53,9 @@ class Item(models.Model):
     
     def activate(self):
         self.circulando=True
+        
+    def getIsActive(self):
+        return "SI" if self.circulando else "NO"
     
     class Meta:
         db_table = 'Item'

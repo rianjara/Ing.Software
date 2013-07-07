@@ -1,12 +1,12 @@
 {% extends "base.html"%}
 
-{%block title%} Nuevo Item{% endblock%}
+{%block title%} {%if editing %}Editar{%else%}Nuevo{%endif%} Item{% endblock%}
 
 {% block content%}
 <div class="container article" id="wrap">
 <a class="btn btn-primary" href="../inventario/" style="float: left;"><span class="fui-arrow-left"></span>Inventario</a>
 
-<h1>Nuevo Item</h1>
+<h1>{%if editing %}Editar{%else%}Nuevo{%endif%} Item</h1>
 
     {% if form.errors %}
         <p style="color: red;">
@@ -38,7 +38,12 @@
         <div class="field">
             {{ form.cantidad.errors }}<label for="cantidad">Cantidad:</label>{{ form.cantidad }}
         </div>
-        <input type="submit" class="btn btn-primary" value="Guardar nuevo item" >
+        {%if editing %}
+        	<div class="field">
+	            {{ form.cantidad.errors }}<label for="circulando">Activo:</label>{{ form.circulando }}
+	        </div>
+        {%endif%}
+        <input type="submit" class="btn btn-primary" value="Guardar item" >
     </form>
    </div>
 {% endblock%}
