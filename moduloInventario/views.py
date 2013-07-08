@@ -1,14 +1,14 @@
 
 from django.db.models import Q
+from django.core.context_processors import csrf
+from django.contrib.auth import authenticate
 from moduloInventario.models import Item, Proveedor, Categoria
-
-from django.core.context_processors import request
 from django.shortcuts import render_to_response, render
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms import ModelForm
 from django import forms
 from django.db.utils import IntegrityError
-from django.http.response import HttpResponseRedirect, HttpResponse
+from django.http.response import HttpResponse
+from django.template import RequestContext
 
 # Create your views here.
 
@@ -63,10 +63,6 @@ def edit_item(pv_codigo,pv_nombre,pv_descripcion,pi_cantidad,pf_costo,pb_circula
     item.cantidad = pi_cantidad
     item.costo_unitario = pf_costo
     item.circulando = pb_circulando
-    """if "SI"==pb_circulando:
-        item.b_circulando = True
-    else:
-        item.b_circulando = False"""
     item.categoria = get_category(pv_categoria)
     item.proveedor = get_provider(pv_proveedor)
     item.save()
@@ -77,6 +73,9 @@ def get_item(pv_id):
 
 def get_item_by_code(pv_codigo):
     return Item.objects.get(codigo=pv_codigo)
+
+def get_items_by_string(string,boolean):
+    return Item.objects.filter(Q(codigo__startswith=string) | Q(nombre__icontains=string) | Q(categoria__nombre__startswith=string) | Q(proveedor__razon_social__startswith=string))
 
 def get_items_by_name(string,boolean):
     return Item.objects.filter(nombre__icontains=string,circulando=True)if boolean else Item.objects.filter(nombre__icontains=string)
@@ -89,14 +88,16 @@ def get_items_by_category(string,boolean):
 
 def search_items(string,search_type,boolean):
     list_item = None
-    if None==search_type:
+    if None==string:
         list_item = Item.objects.filter(circulando=True) if boolean else Item.objects.all()
-    if "name"==search_type:
+    elif "name"==search_type:
         list_item = get_items_by_name(string,boolean)
     elif "code"==search_type:
         list_item = get_items_by_code(string,boolean)
     elif "category"==search_type:
         list_item = get_items_by_category(string,boolean)
+    else:
+        list_item = get_items_by_string(string, boolean)
     return list_item
 
 def delete_item(pv_id):
@@ -131,7 +132,19 @@ def raise_item(pv_codigo,pv_cantidad):
 
 
 def inventario(request):
-    return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None,False)})
+    if not request.GET.__contains__("string_search"):
+        return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None,False)})
+    else:
+        return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(request.GET['string_search'],None,False),'string_busqueda':request.GET['string_search']})
+    """
+    if not request.user.is_authenticated():
+        return redirect('/login/?next=%s' % request.path)
+    else:
+        if not request.method == 'POST':
+            return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None,False if request.user.is_superuser() else True)})
+        else:
+            return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(request.POST['string'],None,False if request.user.is_superuser() else True),'string_busqueda':request.POST['string']})
+    """
 
 def nuevo_item(request):
     if request.method == 'POST':
@@ -144,9 +157,8 @@ def nuevo_item(request):
             else:
                 return render_to_response(request, 'InventarioFrontEnd/item.html', {'form': form,'mensaje':mensaje})
     else:
-        if request.method != 'POST':
-            form = InventarioForm()
-    return render(request, 'InventarioFrontEnd/item.html', {'form': form,'editing': False})
+        form = InventarioForm()
+        return render(request, 'InventarioFrontEnd/item.html', {'form': form,'editing': False})
 
 def editar_item(request):        
     i = Item.objects.get(pk=(request.GET['q']))
@@ -180,5 +192,5 @@ class InventarioForm(forms.ModelForm):
     activo = forms.BooleanField(required=False,initial=True)
     class Meta:
         model = Item
-        
+
         
