@@ -12,11 +12,11 @@ class Proveedor(models.Model):
         return '%s'%(self.razon_social)
 
     def __str__(self):
-        return '%s'% (self.nombre)
+        return '%s'% (self.razon_social)
 
     class Meta:
-        db_table = 'Proveedor'
-        ordering = ['nombre']
+        db_table = 'OS_INVENTARIO_PROVEEDORES'
+        ordering = ['razon_social']
     
 class Categoria(models.Model):
     nombre = models.CharField(max_length=100,null=False,unique=True)
@@ -29,34 +29,51 @@ class Categoria(models.Model):
         return 'CATEGORIA\nNombre: %s\nDescripcion: %s'% (self.nombre,self.descripcion)
     
     class Meta:
-        db_table = 'Categoria'
+        db_table = 'OS_INVENTARIO_CATEGORIAS'
         ordering = ['nombre']
 
 class Item(models.Model):
     codigo = models.CharField(unique=True,max_length=30)
     nombre = models.CharField(max_length=100,null=False)
     descripcion = models.CharField(max_length=2000,null=True)
-    costo_unitario = models.FloatField(null=False)
-    cantidad = models.IntegerField(default=0,null=False)
-    circulando = models.BooleanField(null=False)
-    proveedor = models.ForeignKey(Proveedor)
     categoria = models.ForeignKey(Categoria)
     
     def __str__(self):
         return '%s'% (self.nombre)
     
-    def isActive(self):
-        return self.circulando
-    
-    def inactivate(self):
-        self.circulando=False
-    
-    def activate(self):
-        self.circulando=True
+    class Meta:
+        db_table = 'OS_INVENTARIO_ITEMS'
+        ordering = ['codigo']
         
-    def getIsActive(self):
-        return "SI" if self.circulando else "NO"
+class Item_Costo_Venta(models.Model):
+    item = models.ForeignKey(Item)
+    valor = models.FloatField(null=False)
+    fecha_desde = models.DateTimeField(null=False)
+    fecha_hasta = models.DateTimeField(null=True)
+    promocional = models.BooleanField(null=False,default=False)
     
     class Meta:
-        db_table = 'Item'
-        ordering = ['codigo']
+        db_table = 'OS_INVENTARIO_VALOR_VENTAS'
+        ordering = ['item']
+    
+class Item_Adq_Proveedor(models.Model):
+    item = models.ForeignKey(Item)
+    proveedor = models.ForeignKey(Proveedor)
+    fecha_compra = models.DateField(null=False)
+    valor_compra = models.FloatField(null=False)
+    cantidad_compra = models.IntegerField(null=False)
+    cantidad_disponible = models.IntegerField(null=False)
+    circulando = models.BooleanField(null=False,default=True)
+    
+    class Meta:
+        db_table = 'OS_INVENTARIO_PROVEEDORES_ITEMS'
+        ordering = ['item']
+
+class Item_Adq_Pendiente(models.Model):
+    item = models.ForeignKey(Item,unique=True)
+    cantidad = models.IntegerField(null=False,default=0)
+    
+    class Meta:
+        db_table = 'OS_INVENTARIO_PENDIENTES'
+        ordering = ['item']
+    
