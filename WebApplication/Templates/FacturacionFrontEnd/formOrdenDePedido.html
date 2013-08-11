@@ -1,0 +1,61 @@
+{% extends "base.html"%}
+
+{%block title%} Orden de Pedido{% endblock%}
+{% block jscript%}
+<script src="../static/js/validar-cedula-ruc.js">
+</script>
+{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../clientes/" style="float: left;"><span class="fui-arrow-left"></span>Clientes</a>
+
+<h1>Nueva Orden de Compra</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Please correct the error below: {{ form.errors|pluralize }}.
+        </p>
+    {% endif %}
+
+    <form action="" method="post">{% csrf_token %}
+    
+    	<div class="field">
+            {{ form.codigo.errors }}
+            <label for="id_codigo">C&oacute;digo:</label>
+            {{ form.codigo }}
+        </div>
+        <div class="field">
+            {{ form.codigo_factura.errors }}
+            <label for="id_codigo_factura">Factura Asociada:</label>
+            {{ form.codigo_factura }}
+        </div>        
+        <div class="field">
+            {{ form.fecha_compra.errors }}
+            <label for="id_fecha_compra">Fecha de Compra:</label>
+            {{ form.fecha_compra }}
+        </div>
+        <div class="field">
+            {{ form.fecha_nacimiento.errors }}
+            <label for="id_fecha_facturacion">Fecha de Entrega:</label>
+            {{ form.fecha_nacimiento }}
+        </div>
+        <div class="field">
+            {{ form.cliente.errors }}
+            <label for="id_cliente">Cliente:</label>
+            {{ form.cliente }}
+        </div>        
+        <div class="field">
+            {{ form.items.errors }}
+            <label for="id_items">Items:</label>
+            {{ form.items }}
+        </div>        
+        <div class="field">
+            {{ form.detalle.errors }}
+            <label for="id_detalle">Detalle:</label>
+            {{ form.detalle }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Guardar Orden de Pedido" >
+    </form>
+   </div>
+{% endblock%}
