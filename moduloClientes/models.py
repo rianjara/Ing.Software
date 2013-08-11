@@ -1,7 +1,7 @@
 from django.db import models
 
 class Cliente(models.Model):
-    cedula = models.CharField(max_length=10,null=True)
+    cedula = models.CharField(max_length=10,null=True, unique=True)
     nombre = models.CharField(max_length=30)
     apellido1 = models.CharField(max_length=30,null=True)
     apellido2 = models.CharField(max_length=30,null=True)
@@ -14,8 +14,7 @@ class Cliente(models.Model):
     ruc = models.CharField(max_length=15)
     
     def __str__(self):
-        return '%s %s' %(self.cedula,self.nombre)
-    #"<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>"
+        return '%s %s %s' %(self.cedula,self.nombre, self.apellido1)
     
     def get_fields(self):
         return  [(field.name, field.value) for field in Cliente._meta.fields]
@@ -25,7 +24,7 @@ class Cliente(models.Model):
                 
     class Admin():
         pass
-
+   
 class Consultas(models.Model):
     EYE_CHOICES = (('IZQUIERDO', 'Ojo Izquierdo'),('DERECHO', 'Ojo Derecho'),)
     VISION_CHOICES = (('CERCA', 'Vision de Cerca'),('LEJOS', 'Vision de Lejos'),)
@@ -37,7 +36,7 @@ class Consultas(models.Model):
     av=models.DecimalField(max_digits=5,decimal_places=3)
     add=models.DecimalField(max_digits=5,decimal_places=3)
     dp=models.DecimalField(max_digits=5,decimal_places=3)
-    fecha=models.DateField()
+    fecha=models.DateField(null=True)
     Diagnostico = models.CharField(max_length=200,null=True)
     Observaciones = models.CharField(max_length=200,null=True)
     vista = models.CharField(choices=VISION_CHOICES,max_length=15)
@@ -46,7 +45,3 @@ class Consultas(models.Model):
     
     class Meta:
         ordering=["fecha"]
-        
-        
-        
-    
