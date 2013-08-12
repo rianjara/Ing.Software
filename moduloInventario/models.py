@@ -6,7 +6,7 @@ class Proveedor(models.Model):
     nombre = models.CharField(max_length=200,null=False)
     razon_social = models.CharField(max_length=200,null=False,unique=True)
     ruc = models.CharField(max_length=20,null=False)
-    telefono = models.CharField(max_length=20,null=True)
+    telefono = models.CharField(max_length=10,null=True)
     
     def __unicode__(self):
         return '%s'%(self.razon_social)
@@ -36,6 +36,8 @@ class Item(models.Model):
     codigo = models.CharField(unique=True,max_length=30)
     nombre = models.CharField(max_length=100,null=False)
     descripcion = models.CharField(max_length=2000,null=True)
+    cantidad = models.IntegerField()
+    valor_venta = models.FloatField(null=False)
     categoria = models.ForeignKey(Categoria)
     
     def __str__(self):
@@ -44,36 +46,24 @@ class Item(models.Model):
     class Meta:
         db_table = 'OS_INVENTARIO_ITEMS'
         ordering = ['codigo']
-        
-class Item_Costo_Venta(models.Model):
-    item = models.ForeignKey(Item)
-    valor = models.FloatField(null=False)
-    fecha_desde = models.DateTimeField(null=False)
-    fecha_hasta = models.DateTimeField(null=True)
-    promocional = models.BooleanField(null=False,default=False)
     
-    class Meta:
-        db_table = 'OS_INVENTARIO_VALOR_VENTAS'
-        ordering = ['item']
-    
-class Item_Adq_Proveedor(models.Model):
-    item = models.ForeignKey(Item)
+class Orden_Compra(models.Model):
     proveedor = models.ForeignKey(Proveedor)
-    fecha_compra = models.DateField(null=False)
-    valor_compra = models.FloatField(null=False)
-    cantidad_compra = models.IntegerField(null=False)
-    cantidad_disponible = models.IntegerField(null=False)
-    circulando = models.BooleanField(null=False,default=True)
+    factura = models.IntegerField(null=False)
+    fecha = models.DateField(null=False)
+    valor_total = models.FloatField(null=False)
     
     class Meta:
-        db_table = 'OS_INVENTARIO_PROVEEDORES_ITEMS'
-        ordering = ['item']
-
-class Item_Adq_Pendiente(models.Model):
-    item = models.ForeignKey(Item,unique=True)
-    cantidad = models.IntegerField(null=False,default=0)
+        db_table = 'OS_INVENTARIO_COMPRAS'
+        ordering = ['fecha']
+    
+class Detalle_Orden_Compra(models.Model):
+    item = models.ForeignKey(Item)
+    orden = models.ForeignKey(Orden_Compra)
+    cantidad = models.IntegerField(null=False)
+    valor_unitario = models.FloatField(null=False)
     
     class Meta:
-        db_table = 'OS_INVENTARIO_PENDIENTES'
-        ordering = ['item']
+        db_table = 'OS_INVENTARIO_DETALLES_COMPRAS'
+        ordering = ['orden']
     

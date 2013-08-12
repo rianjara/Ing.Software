@@ -2,7 +2,7 @@
 from django.db.models import Q
 #from django.contrib.auth import authenticate
 from django.template import RequestContext
-from moduloInventario.models import Item, Proveedor, Categoria, Item_Adq_Proveedor, Item_Adq_Pendiente#, Item_Costo_Venta
+from moduloInventario.models import Item, Proveedor, Categoria, Orden_Compra, Detalle_Orden_Compra
 from django.shortcuts import render_to_response, render
 from django.core.exceptions import ObjectDoesNotExist
 from django import forms
@@ -28,6 +28,23 @@ def get_providers_by_name(string):
 
 def get_providers_by_social_reason(string):
     return Proveedor.objects.filter(razon_social__icontains=string)
+
+def new_provider(pv_nombre,pv_razon_social,pv_ruc,pv_telefono):
+    if None == get_provider_by_social_reason(pv_razon_social):
+        provider = Proveedor(nombre=pv_nombre,razon_social=pv_razon_social,ruc=pv_ruc,telefono=pv_telefono)
+        provider.save()
+        return 0
+    else:
+        return 1
+    """try:
+    except IntegrityError,e:
+        return "Operacion Fallida. %s"%("Ya existe item con dicho codigo."if e.args[0].endswith('unique') else 'Algun campo requerido se ha enviado vacio.')
+    except ObjectDoesNotExist,e:
+        return "Operacion Fallida. %s no existe."%("Item"if e.args[0].startswith('Item') else 'Proveedor')
+    except ValueError:
+        return "Operacion Fallida. En algun campo se esta enviando un tipo de dato incorrecto."
+    """
+
 
 def get_category(pv_id):
     return Categoria.objects.get(id=pv_id)
