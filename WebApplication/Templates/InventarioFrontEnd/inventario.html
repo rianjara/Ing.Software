@@ -57,8 +57,8 @@
 			{% for item in lista_items %}
 				tRow = document.createElement('tr');
 				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarItem?q={{item.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
-				btnElim = "<a class=\"btn btn-danger\" href=\"javascript:void(0)\" onclick=\"eliminarItem('{{item.id}}');\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
-				tRow.innerHTML = "<td>{{item.codigo}}</td><td>{{item.nombre}}</td><td>{{item.descripcion}}</td><td>{{item.categoria}}</td><td>{{item.proveedor}}</td><td>{{item.costo_unitario}}</td><td>{{item.cantidad}}</td><td>{{item.getIsActive}}</td>"+"<td width=\"50\">"+btnEdit+btnElim+"</td>";
+				//btnElim = "<a class=\"btn btn-danger\" href=\"javascript:void(0)\" onclick=\"eliminarItem('{{item.id}}');\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
+				tRow.innerHTML = "<td>{{item.codigo}}</td><td>{{item.nombre}}</td><td>{{item.descripcion}}</td><td>{{item.categoria}}</td><td>{{item.valor_venta}}</td><td>{{item.cantidad}}</td>"+"<td width=\"50\">"+btnEdit+"</td>";
 				items.appendChild(tRow);
 				lenght++;			    
 			{% endfor %}
@@ -66,14 +66,14 @@
 	}
 	
 	function eliminarItem(id){
-		ajaxFunction();
-		ajaxRequest.onreadystatechange = function(){
-		   if(ajaxRequest.readyState == 4){
-		   	  mostrarMensaje(ajaxRequest.responseText);
-		   }
-		}
-		ajaxRequest.open("GET", "/eliminarItem?q=" + id, false);
- 		ajaxRequest.send(null);
+		//ajaxFunction();
+		//ajaxRequest.onreadystatechange = function(){
+		//   if(ajaxRequest.readyState == 4){
+		//   	  mostrarMensaje(ajaxRequest.responseText);
+		//   }
+		//}
+		//ajaxRequest.open("GET", "/eliminarItem?q=" + id, false);
+ 		//ajaxRequest.send(null);
 	}
 	
 	function ajaxFunction(){
@@ -112,7 +112,7 @@
 			<table>
 				<thead>
 					<tr>
-						<th>Codigo</th><th>Item</th><th>Descripcion</th><th>Categoria</th><th>Proveedor</th><th>Costo</th><th>Cantidad</th><th>Activo</th>
+						<th>Codigo</th><th>Item</th><th>Descripcion</th><th>Categoria</th><th>Valor Venta</th><th>Cantidad Disponible</th>
 					</tr>
 				</thead>
 				<tbody id="items">

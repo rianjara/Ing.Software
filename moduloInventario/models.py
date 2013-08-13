@@ -36,7 +36,7 @@ class Item(models.Model):
     codigo = models.CharField(unique=True,max_length=30)
     nombre = models.CharField(max_length=100,null=False)
     descripcion = models.CharField(max_length=2000,null=True)
-    cantidad = models.IntegerField()
+    cantidad = models.IntegerField(null=True)
     valor_venta = models.FloatField(null=False)
     categoria = models.ForeignKey(Categoria)
     
