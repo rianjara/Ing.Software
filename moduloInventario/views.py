@@ -44,10 +44,12 @@ def new_provider(pv_nombre,pv_razon_social,pv_ruc,pv_telefono):
         return "Operacion Exitosa. El proveedor ha sido ingresado en la base de datos."
     
 def update_provider(proveedor,pv_nombre,pv_razon_social,pv_ruc,pv_telefono):
-    tmp = get_provider_by_social_reason(pv_razon_social)
-    if tmp != None:
+    try:
+        tmp = get_provider_by_social_reason(pv_razon_social)
         if tmp.id != proveedor.id:
             return "Operacion Fallida. No puede asignar una razon social que ya esta siendo usado por otro proveedor."
+    except:
+        tmp = None
     proveedor.nombre = pv_nombre
     proveedor.razon_social = pv_razon_social
     proveedor.ruc = pv_ruc
@@ -94,10 +96,12 @@ def new_category(pv_nombre,pv_descripcion):
         return "Operacion Exitosa. La categoria ha sido ingresada en la base de datos."
     
 def update_category(categoria,p_nombre,p_descripcion):
-    tmp = get_category_by_name(p_nombre)
-    if tmp != None:
+    try:
+        tmp = get_category_by_name(p_nombre)
         if tmp.id != categoria.id:
             return "Operacion Fallida. No puede asignar un nombre que ya esta siendo usado por otra categoria."
+    except:
+        tmp = None
     categoria.nombre = p_nombre
     categoria.descripcion = p_descripcion
     categoria.save()
@@ -165,10 +169,12 @@ def create_item(pv_codigo,pv_nombre,pv_descripcion,pf_valor_venta,pv_categoria):
             return "Operacion Exitosa. El item se ha creado con exito."
     
 def update_item(item,p_codigo,p_nombre,p_descripcion,p_categoria,p_valor):
-    tmp = get_item_by_code(p_codigo)
-    if tmp != None:
+    try:
+        tmp = get_item_by_code(p_codigo)
         if tmp.id != item.id:
             return "Operacion Fallida. No puede asignar un codigo que ya esta siendo usado por otro item."
+    except:
+        tmp = None
     item.codigo = p_codigo
     item.nombre = p_nombre
     item.descripcion = p_descripcion
@@ -177,7 +183,7 @@ def update_item(item,p_codigo,p_nombre,p_descripcion,p_categoria,p_valor):
     item.save()
     return "Operacion Exitosa. Los datos del item han sido actualizados."
    
-def edit_item(p_id,pv_codigo,pv_nombre,pv_descripcion,pf_valor_venta,pv_categoria):
+def edit_item(p_id,pv_codigo,pv_nombre,pf_valor_venta,pv_descripcion,pv_categoria):
     if pv_codigo is None:
         return "Operacion Fallida. El campo de el codigo esta vacio."
     elif pv_nombre is None:
@@ -186,14 +192,13 @@ def edit_item(p_id,pv_codigo,pv_nombre,pv_descripcion,pf_valor_venta,pv_categori
         return "Operacion Fallida. El campo de el valor de venta esta vacio."
     elif pv_categoria is None:
         return "Operacion Fallida. El campo de la categoria esta vacio."
-    elif type(pf_valor_venta) != float:
-        return "Operacion Fallida. El campo valor venta no corresponde al tipo de dato flotante"
-    else:
+    try:
         item = get_item(p_id)
-        if item is None:
-            return "Operacion Fallida. El item que desea modificar no existe en la base de datos."
-        else:
-            return update_item(item, pv_codigo, pv_nombre, pv_descripcion, pv_categoria, pf_valor_venta)
+        return update_item(item, pv_codigo, pv_nombre, pv_descripcion, pv_categoria, pf_valor_venta)
+    except:
+        return "Operacion Fallida. El item que desea modificar no existe en la base de datos."    
+
+def new_order(p_id_proveedor,pi_factura,pd_fecha):
 
 def inventario(request):
     """
@@ -207,11 +212,6 @@ def inventario(request):
         return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(request.GET['string_search'],None),'string_busqueda':request.GET['string_search']})
 
 def nuevo_item(request):
-    """
-    if not request.user.is_authenticated():
-        return redirect('/login/?next=%s' % request.path)
-    else:
-    """
     if request.method == 'POST':
         form = ItemForm(request.POST)
         if form.is_valid():
@@ -226,7 +226,12 @@ def nuevo_item(request):
         form = ItemForm()
         return render_to_response('InventarioFrontEnd/item.html', {'form': form,'editing': False},context_instance=RequestContext(request))
 
-def editar_item(request):        
+def editar_item(request):
+    """
+    if not request.user.is_authenticated():
+        return redirect('/login/?next=%s' % request.path)
+    else:
+    """      
     i = Item.objects.get(pk=(request.GET['q']))
     if request.method != 'POST':
         form = ItemForm(instance=i)
@@ -236,7 +241,7 @@ def editar_item(request):
     else:
         if request.method == 'POST':
             form = ItemForm(request.POST)
-            mensaje = edit_item(request.POST['codigo'], request.POST['nombre'], request.POST['valor_venta'], request.POST['descripcion'], request.POST['categoria'])
+            mensaje = edit_item(request.POST['id'],request.POST['codigo'], request.POST['nombre'], request.POST['valor_venta'], request.POST['descripcion'], request.POST['categoria'])
             return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':mensaje})
     return render(request, 'InventarioFrontEnd/item.html', {'form': form,'editing': True})
 
@@ -264,4 +269,19 @@ class CategoriaForm(forms.ModelForm):
     class Meta:
         model = Categoria
 
+class OrdenCompraForm(forms.ModelForm):
+    proveedor = forms.ModelChoiceField(queryset=get_providers())
+    factura = forms.IntegerField(required=True)
+    fecha = forms.DateField(required=True)
+    valor_total = forms.FloatField(required=True,initial=0)
+    class Meta:
+        model = Orden_Compra
+
+class DetalleOrdenCompraForm(forms.ModelForm):
+    item = forms.ModelChoiceField(queryset=search_items(None, None))
+    orden = forms.IntegerField(required=True)
+    cantidad = forms.IntegerField(required=True)
+    valor_unitario = forms.FloatField(required=True,initial=0)
+    class Meta:
+        model = Detalle_Orden_Compra
         
