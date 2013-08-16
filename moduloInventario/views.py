@@ -199,6 +199,107 @@ def edit_item(p_id,pv_codigo,pv_nombre,pf_valor_venta,pv_descripcion,pv_categori
         return "Operacion Fallida. El item que desea modificar no existe en la base de datos."    
 
 def new_order(p_id_proveedor,pi_factura,pd_fecha):
+    if p_id_proveedor is None:
+        return "Operacion Fallida. Debe seleccionar un proveedor."
+    elif pi_factura is None:
+        return "Operacion Fallida. Debe digitalizar el numero de la factura."
+    elif pd_fecha is None:
+        return "Operacion Fallida. Debe seleccionar la fecha de adquisicion."
+    try:
+        Orden_Compra.objects.get(proveedor=p_id_proveedor,factura=pi_factura)
+        return "Operacion Fallida. Ya existe una orden para dicho proveedor con el mismo numero de factura"
+    except:
+        orden = Orden_Compra(factura=pi_factura,fecha=pd_fecha,valor_total=0)
+        orden.proveedor = get_provider(p_id_proveedor)
+        orden.save()
+        return "Operacion Exitosa. Se ha ingresado la orden #%d"%orden.id
+    
+def update_order(orden,p_id_proveedor,pi_factura,pd_fecha):
+    try:
+        tmp = Orden_Compra.objects.get(proveedor=p_id_proveedor,factura=pi_factura)
+        if tmp.id != orden.id:
+            return "Operacion Fallida. No puede realizar la actualizacion debido que ya esxiste ese numero de factura para el proveedor seleccionado."
+    except:
+        tmp = None
+    orden.factura = pi_factura
+    orden.fecha = pd_fecha
+    orden.proveedor = get_provider(p_id_proveedor)
+    orden.save()
+    return "Operacion Exitosa. Los datos de la orden han sido actualizados."
+    
+def edit_order(p_id,p_id_proveedor,pi_factura,pd_fecha):
+    if p_id is None:
+        return "Operacion Fallida. Falta el id del proveedor."
+    elif p_id_proveedor is None:
+        return "Operacion Fallida. Debe seleccionar un proveedor."
+    elif pi_factura is None:
+        return "Operacion Fallida. Debe digitalizar el numero de la factura."
+    elif pd_fecha is None:
+        return "Operacion Fallida. Debe seleccionar la fecha de adquisicion."
+    try:
+        orden = Orden_Compra.objects.get(id=p_id)
+        return update_order(orden, p_id_proveedor, pi_factura, pd_fecha)
+    except:
+        return "Operacion Fallida. La orden que desea modificar no existe en la base de datos."
+    
+def new_order_detail(p_id_orden,p_id_item,pi_cantidad,pf_valor):
+    if p_id_orden is None:
+        return "Operacion Fallida. Falta el numero de la orden de compra."
+    elif p_id_item is None:
+        return "Operacion Fallida. No ha seleccionado el item."
+    elif pi_cantidad is None:
+        return "Operacion Fallida. Debe ingresar la cantidad de items."
+    elif pf_valor is None:
+        return "Operacion Fallida. Debe ingresar el valor unitario de cada item."
+    try:
+        Detalle_Orden_Compra.objects.get(orden=p_id_orden,item=p_id_item)
+        return "Operacion Fallida. Ya se ha registrado el item en dicha orden de compra."
+    except:
+        detail = Detalle_Orden_Compra(cantidad=pi_cantidad,valor_unitario=pf_valor)
+        detail.item = get_item(p_id_item)
+        detail.orden = Orden_Compra.objects.get(id=p_id_orden)
+        detail.orden.valor_total = float(detail.orden.valor_total) + (float(pf_valor))*(int(pi_cantidad))
+        detail.save()
+        return "Operacion Exitosa. El item ha sido ingresado en la orden de compra."
+
+def update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
+    try:
+        tmp = Detalle_Orden_Compra.objects.get(item=p_id_item,orden=p_id_orden)
+        if tmp.id != detail.id:
+            return "Operacion Fallida. No puede realizar la actualizacion debido que ya esxiste ese item en dicha orden de compra."
+    except:
+        tmp = None
+    detail.orden.valor_total = detail.orden.valor_total - detail.cantidad*detail.valor
+    detail.orden = Orden_Compra.objects.get(id=p_id_orden)
+    detail.item = get_item(p_id_item)
+    detail.cantidad = get_item(p_id_item)
+    detail.valor = get_item(p_id_item)
+    detail.orden.valor_total = detail.orden.valor_total + detail.cantidad*detail.valor
+    detail.save()
+    return "Operacion Exitosa. Los datos del detalle de la orden #%d han sido actualizados"%p_id_orden
+
+def edit_order_detail(p_id_detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
+    if p_id_orden is None:
+        return "Operacion Fallida. Falta el numero de la orden de compra."
+    elif p_id_item is None:
+        return "Operacion Fallida. No ha seleccionado el item."
+    elif pi_cantidad is None:
+        return "Operacion Fallida. Debe ingresar la cantidad de items."
+    elif pf_valor is None:
+        return "Operacion Fallida. Debe ingresar el valor unitario de cada item."
+    try:
+        detail = Detalle_Orden_Compra.objects.get(id=p_id_detail)
+        return update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor)
+    except:
+        return "Operacion Fallida. El detalle de la orden que desea modificar no existe."
+    
+def delete_order_detail(p_id_detail):
+    try:
+        detail = Detalle_Orden_Compra.objects.get(id=p_id_detail)
+        detail.delete()
+        return "Operacion Exitosa. El detalle de compra ha sido eliminado"
+    except:
+        return "Operacion Fallida. El detalle que desea eliminar no se encuentra en la base de datos."
 
 def inventario(request):
     """
@@ -212,6 +313,11 @@ def inventario(request):
         return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(request.GET['string_search'],None),'string_busqueda':request.GET['string_search']})
 
 def nuevo_item(request):
+    """
+    if not request.user.is_authenticated():
+        return redirect('/login/?next=%s' % request.path)
+    else:
+    """      
     if request.method == 'POST':
         form = ItemForm(request.POST)
         if form.is_valid():
@@ -245,6 +351,100 @@ def editar_item(request):
             return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': search_items(None,None),'mensaje':mensaje})
     return render(request, 'InventarioFrontEnd/item.html', {'form': form,'editing': True})
 
+def ordenes_compras(request):
+    """
+    if not request.user.is_authenticated():
+        return redirect('/login/?next=%s' % request.path)
+    else:
+    """
+    return render_to_response('InventarioFrontEnd/ordenes_compra.html',{'lista': Orden_Compra.objects.all()})
+
+def nueva_orden_compra(request):
+    """
+    if not request.user.is_authenticated():
+        return redirect('/login/?next=%s' % request.path)
+    else:
+    """      
+    if request.method == 'POST':
+        form = OrdenCompraForm(request.POST)
+        if form.is_valid():
+            mensaje = new_order(request.POST['proveedor'], request.POST['factura'], request.POST['fecha'])
+            if mensaje.startswith("Operacion Exitosa."):
+                return render_to_response('InventarioFrontEnd/ordenes_compra.html',{'lista': Orden_Compra.objects.all(),'mensaje':mensaje})
+            else:
+                return render_to_response('InventarioFrontEnd/compra.html', {'form': form,'mensaje':mensaje},context_instance=RequestContext(request))
+        else:
+            return render_to_response('InventarioFrontEnd/compra.html', {'form': form,'mensaje':form.errors},context_instance=RequestContext(request))
+    else:
+        form = OrdenCompraForm()
+        return render_to_response('InventarioFrontEnd/compra.html', {'form': form,'editing': False},context_instance=RequestContext(request))
+
+def editar_orden_compra(request):
+    """
+    if not request.user.is_authenticated():
+        return redirect('/login/?next=%s' % request.path)
+    else:
+    """      
+    i = Orden_Compra.objects.get(pk=(request.GET['q']))
+    if request.method != 'POST':
+        form = OrdenCompraForm(instance=i)
+        form.id = request.GET['q']
+        if form.is_valid():
+            form.save()
+    else:
+        if request.method == 'POST':
+            form = OrdenCompraForm(request.POST)
+            mensaje = edit_order(request.POST['id'],request.POST['proveedor'], request.POST['factura'], request.POST['fecha'])
+            if mensaje.startswith("Operacion Exitosa."):
+                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(id=request.POST['id']),'orden_id':request.POST['id']})
+            else:
+                return render(request, 'InventarioFrontEnd/compra.html', {'form': form,'editing': True,'mensaje': mensaje},context_instance=RequestContext(request))
+    return render(request, 'InventarioFrontEnd/compra.html', {'form': form,'editing': True})
+
+def nuevo_detalle_compra(request):
+    """
+    if not request.user.is_authenticated():
+        return redirect('/login/?next=%s' % request.path)
+    else:
+    """
+    if request.method == 'POST':
+        form = DetalleOrdenCompraForm(request.POST)
+        tmp = Orden_Compra.objects.get(id=request.POST['orden'])
+        form.orden = tmp
+        if form.is_valid():
+            mensaje = new_order_detail(request.POST['orden'],request.POST['item'], request.POST['cantidad'], request.POST['valor_unitario'])
+            if mensaje.startswith("Operacion Exitosa."):
+                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(id=request.POST['orden'])})
+            else:
+                return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'mensaje':mensaje,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
+        else:
+            return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'mensaje':form.errors,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
+    else:
+        form = DetalleOrdenCompraForm()
+        return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'editing': False,'orden_id':request.GET['orden_id']},context_instance=RequestContext(request))
+
+def editar_detalle_compra(request):
+    """
+    if not request.user.is_authenticated():
+        return redirect('/login/?next=%s' % request.path)
+    else:
+    """      
+    i = Detalle_Orden_Compra.objects.get(pk=(request.GET['q']))
+    if request.method != 'POST':
+        form = DetalleOrdenCompraForm(instance=i)
+        form.id = request.GET['q']
+        if form.is_valid():
+            form.save()
+    else:
+        if request.method == 'POST':
+            form = DetalleOrdenCompraForm(request.POST)
+            mensaje = edit_order(request.POST['id'],request.POST['orden'],request.POST['item'], request.POST['cantidad'], request.POST['valor_unitario'])
+            if mensaje.startswith("Operacion Exitosa."):
+                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(id=request.POST['orden'])})
+            else:
+                return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'mensaje': mensaje,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
+    return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'orden_id':form.orden})
+
 class ItemForm(forms.ModelForm):   
     codigo = forms.CharField(required=True,max_length=30)
     nombre = forms.CharField(required=True,max_length=100)
@@ -273,7 +473,7 @@ class OrdenCompraForm(forms.ModelForm):
     proveedor = forms.ModelChoiceField(queryset=get_providers())
     factura = forms.IntegerField(required=True)
     fecha = forms.DateField(required=True)
-    valor_total = forms.FloatField(required=True,initial=0)
+    valor_total = forms.FloatField(required=False,initial=0)
     class Meta:
         model = Orden_Compra
 

@@ -1,0 +1,33 @@
+{% extends "base.html"%}
+
+{%block title%} {%if editing %}Editar{%else%}Nueva{%endif%} Orden Compra{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../ordenesCompra/" style="float: left;"><span class="fui-arrow-left"></span>Ordenes de Compra</a>
+
+<h1>{%if editing %}Editar{%else%}Nueva{%endif%} Orden Compra</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Parece que olvido ingresar alguna informacion, por favor intentelo de nuevo.
+        </p>
+    {% endif %}
+	{% if None != mensaje %}
+    	<p id="mensaje" style="color: red;">{{ mensaje }}</p>
+    {% endif %}
+    <form action="" method="post">{% csrf_token %}
+    	<input type="hidden" name="id" value="{{form.id}}"/>
+    	<div class="field">
+            {{ form.proveedor.errors }}<label for="proveedor">Proveedor:</label>{{ form.proveedor }}
+        </div>
+        <div class="field">
+            {{ form.factura.errors }}<label for="factura">No. Factura:</label>{{ form.factura }}
+        </div>        
+        <div class="field">
+            {{ form.fecha.errors }}<label for="fecha">Fecha:</label>{{ form.fecha }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Siguiente" >
+    </form>
+   </div>
+{% endblock%}

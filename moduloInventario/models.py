@@ -53,6 +53,9 @@ class Orden_Compra(models.Model):
     fecha = models.DateField(null=False)
     valor_total = models.FloatField(null=False)
     
+    def __str__(self):
+        return '%d'% (self.id)
+    
     class Meta:
         db_table = 'OS_INVENTARIO_COMPRAS'
         ordering = ['fecha']
@@ -62,6 +65,9 @@ class Detalle_Orden_Compra(models.Model):
     orden = models.ForeignKey(Orden_Compra)
     cantidad = models.IntegerField(null=False)
     valor_unitario = models.FloatField(null=False)
+        
+    def __str__(self):
+        return '%d - %s'%(self.orden.id,self.item)
     
     class Meta:
         db_table = 'OS_INVENTARIO_DETALLES_COMPRAS'
