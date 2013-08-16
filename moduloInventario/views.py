@@ -260,6 +260,7 @@ def new_order_detail(p_id_orden,p_id_item,pi_cantidad,pf_valor):
         detail.orden = Orden_Compra.objects.get(id=p_id_orden)
         detail.orden.valor_total = unicode(float(detail.orden.valor_total) + (float(pf_valor))*(int(pi_cantidad)))
         detail.save()
+        detail.orden.save()
         return "Operacion Exitosa. El item ha sido ingresado en la orden de compra."
 
 def update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
@@ -269,14 +270,15 @@ def update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
             return "Operacion Fallida. No puede realizar la actualizacion debido que ya esxiste ese item en dicha orden de compra."
     except:
         tmp = None
-    detail.orden.valor_total = detail.orden.valor_total - detail.cantidad*detail.valor
+    total_en_item_old = (float(detail.valor_unitario))*(int(detail.cantidad))
+    total_en_item_new = (float(pf_valor))*(int(pi_cantidad))
     detail.orden = Orden_Compra.objects.get(id=p_id_orden)
     detail.item = get_item(p_id_item)
-    detail.cantidad = get_item(p_id_item)
-    detail.valor = get_item(p_id_item)
-    detail.orden.valor_total = unicode(float(detail.orden.valor_total) + (float(pf_valor))*(int(pi_cantidad)))
+    detail.cantidad = pi_cantidad
+    detail.valor = pf_valor
+    detail.orden.valor_total = unicode(float(detail.orden.valor_total) - total_en_item_old + total_en_item_new)
     detail.save()
-    return "Operacion Exitosa. Los datos del detalle de la orden #%d han sido actualizados"%p_id_orden
+    return "Operacion Exitosa. Los datos del detalle de la orden #%s han sido actualizados"%p_id_orden
 
 def edit_order_detail(p_id_detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
     if p_id_orden is None:
@@ -289,9 +291,9 @@ def edit_order_detail(p_id_detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
         return "Operacion Fallida. Debe ingresar el valor unitario de cada item."
     try:
         detail = Detalle_Orden_Compra.objects.get(id=p_id_detail)
-        return update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor)
     except:
         return "Operacion Fallida. El detalle de la orden que desea modificar no existe."
+    return update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor)
     
 def delete_order_detail(p_id_detail):
     try:
