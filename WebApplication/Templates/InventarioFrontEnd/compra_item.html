@@ -18,7 +18,9 @@
     {% endif %}
     <form action="" method="post">{% csrf_token %}
     	<input type="hidden" name="id" value="{{form.id}}"/>
-    	<input type="hidden" name="orden" value="{{orden_id}}"/>
+    	<div class="field">
+            {{ form.orden.errors }}<label for="item">Orden:</label>{{ form.orden }}
+        </div>
     	<div class="field">
             {{ form.item.errors }}<label for="item">Item:</label>{{ form.item }}
         </div>

@@ -258,7 +258,7 @@ def new_order_detail(p_id_orden,p_id_item,pi_cantidad,pf_valor):
         detail = Detalle_Orden_Compra(cantidad=pi_cantidad,valor_unitario=pf_valor)
         detail.item = get_item(p_id_item)
         detail.orden = Orden_Compra.objects.get(id=p_id_orden)
-        detail.orden.valor_total = float(detail.orden.valor_total) + (float(pf_valor))*(int(pi_cantidad))
+        detail.orden.valor_total = unicode(float(detail.orden.valor_total) + (float(pf_valor))*(int(pi_cantidad)))
         detail.save()
         return "Operacion Exitosa. El item ha sido ingresado en la orden de compra."
 
@@ -274,7 +274,7 @@ def update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
     detail.item = get_item(p_id_item)
     detail.cantidad = get_item(p_id_item)
     detail.valor = get_item(p_id_item)
-    detail.orden.valor_total = detail.orden.valor_total + detail.cantidad*detail.valor
+    detail.orden.valor_total = unicode(float(detail.orden.valor_total) + (float(pf_valor))*(int(pi_cantidad)))
     detail.save()
     return "Operacion Exitosa. Los datos del detalle de la orden #%d han sido actualizados"%p_id_orden
 
@@ -396,7 +396,7 @@ def editar_orden_compra(request):
             form = OrdenCompraForm(request.POST)
             mensaje = edit_order(request.POST['id'],request.POST['proveedor'], request.POST['factura'], request.POST['fecha'])
             if mensaje.startswith("Operacion Exitosa."):
-                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(id=request.POST['id']),'orden_id':request.POST['id']})
+                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=request.POST['id']),'orden_id':request.POST['id']})
             else:
                 return render(request, 'InventarioFrontEnd/compra.html', {'form': form,'editing': True,'mensaje': mensaje},context_instance=RequestContext(request))
     return render(request, 'InventarioFrontEnd/compra.html', {'form': form,'editing': True})
@@ -409,19 +409,18 @@ def nuevo_detalle_compra(request):
     """
     if request.method == 'POST':
         form = DetalleOrdenCompraForm(request.POST)
-        tmp = Orden_Compra.objects.get(id=request.POST['orden'])
-        form.orden = tmp
         if form.is_valid():
             mensaje = new_order_detail(request.POST['orden'],request.POST['item'], request.POST['cantidad'], request.POST['valor_unitario'])
             if mensaje.startswith("Operacion Exitosa."):
-                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(id=request.POST['orden'])})
+                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=request.POST['orden']),'orden_id':request.POST['orden']})
             else:
                 return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'mensaje':mensaje,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
         else:
             return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'mensaje':form.errors,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
     else:
         form = DetalleOrdenCompraForm()
-        return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'editing': False,'orden_id':request.GET['orden_id']},context_instance=RequestContext(request))
+        form.orden = Orden_Compra.objects.get(id=request.GET['orden_id'])
+        return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'editing': False},context_instance=RequestContext(request))
 
 def editar_detalle_compra(request):
     """
@@ -440,7 +439,7 @@ def editar_detalle_compra(request):
             form = DetalleOrdenCompraForm(request.POST)
             mensaje = edit_order(request.POST['id'],request.POST['orden'],request.POST['item'], request.POST['cantidad'], request.POST['valor_unitario'])
             if mensaje.startswith("Operacion Exitosa."):
-                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(id=request.POST['orden'])})
+                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=request.POST['orden'])})
             else:
                 return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'mensaje': mensaje,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
     return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'orden_id':form.orden})
@@ -479,7 +478,7 @@ class OrdenCompraForm(forms.ModelForm):
 
 class DetalleOrdenCompraForm(forms.ModelForm):
     item = forms.ModelChoiceField(queryset=search_items(None, None))
-    orden = forms.IntegerField(required=True)
+    orden = forms.ModelChoiceField(queryset=Orden_Compra.objects.all())
     cantidad = forms.IntegerField(required=True)
     valor_unitario = forms.FloatField(required=True,initial=0)
     class Meta:
