@@ -1,5 +1,5 @@
 from django.contrib import admin
-from WebApplication.views import current_datetime, hello, index, error404
+from WebApplication.views import index, error404
 from moduloInventario.views import inventario, nuevo_item, editar_item,\
     eliminar_item
 from django.conf.urls import patterns, url, include
@@ -7,7 +7,7 @@ from moduloClientes.views import clientes, buscar_form, buscar_cliente,\
     nuevo_cliente, editar_cliente, eliminar_cliente, consultas, nueva_consulta
 from moduloFacturacion.views import abonos, nuevo_abono, nueva_orden_pedido,\
     editar_orden_pedido, ordenes_pedido
-from django.contrib.auth import login, logout
+from moduloAutenticacion.views import login, logout
 from moduloContabilidad.views import gastos,cuentas_por_pagar, ingresos_egresos, nuevo_gasto
 
 # Uncomment the next two lines to enable the admin:

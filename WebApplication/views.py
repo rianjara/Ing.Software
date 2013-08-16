@@ -1,16 +1,5 @@
-from django.shortcuts import render_to_response, render
-from django.http import HttpResponse
-import datetime
-from django.template.context import Context
-from django.template import loader
-from django.template.context import RequestContext
+from django.shortcuts import render
 
-def hello(request):
-    return HttpResponse("Ola k ase... Programando en django o q ase? :B")
-
-def current_datetime(request):
-    now = datetime.datetime.now()
-    return render_to_response('ClientesFrontEnd/current_datetime.html',{'current_date': now})
 
 def index(request):
     return render(request, 'index.html')

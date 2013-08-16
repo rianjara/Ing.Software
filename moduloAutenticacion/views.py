@@ -21,9 +21,9 @@ def login(request):
                     redirect = request.GET.get('next', '/index')
                     return HttpResponseRedirect(redirect)
                 else:
-                    return render_to_response('/noactivo.html',context_instance = RequestContext(request))
+                    return render_to_response('AutenticacionFrontEnd/login.html',{'form': form}, context_instance = RequestContext(request))
             else:
-                return render_to_response('/nousuario.html',context_instance = RequestContext(request))
+                return render_to_response('AutenticacionFrontEnd/login.html',{'form': form}, context_instance = RequestContext(request))
     else:
         form = AuthenticationForm()
         return render_to_response('AutenticacionFrontEnd/login.html',{'form': form}, context_instance = RequestContext(request))

@@ -1,7 +1,7 @@
 from django.db import models
 
 class Cliente(models.Model):
-    cedula = models.CharField(max_length=10,null=True, unique=True)
+    cedula = models.CharField(max_length=10,null=True)
     nombre = models.CharField(max_length=30)
     apellido1 = models.CharField(max_length=30,null=True)
     apellido2 = models.CharField(max_length=30,null=True)

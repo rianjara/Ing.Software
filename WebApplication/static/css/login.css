@@ -10,9 +10,9 @@ body {
     background: #48C9AF;
     margin: 25px auto;
     width: 390px;
-    height: 340px;
     position: relative;
     font-family: 'Roboto';
+    padding-bottom: 20px;
 }
 .tabs {
     background-color: #c0392b;
@@ -29,12 +29,15 @@ body {
     font-size: 42px;
     padding-top: 10px;
     padding-bottom: 10px;
+    font-weight: bold;
 }
 .form-action p {
-    font-size: 17px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    line-height: 25px;
+    font-weight: bolder;
+	font-size: 17px;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	line-height: 25px;
+	text-align: justify;
 }
 form {
     padding-right: 20px !important;

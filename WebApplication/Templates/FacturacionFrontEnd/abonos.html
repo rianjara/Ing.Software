@@ -68,21 +68,6 @@
 	</script>
 <body onload="loadItems();">
 	<div class="container article" id="wrap">
-	<a style="display: block;
-					text-decoration: none;
-					width: 70px;
-					height: 20px;
-					background-color: khaki;
-					float: right;
-					border-radius: 10px;
-					border: 2px solid;
-					margin-bottom: 20px;" href="
-		{% if user.is_authenticated %}
-		    /logout">Logout</a>
-	    {% else %}
-	    	/login">Login</a>
-	    {% endif %}
-	    <div style="clear: both;"></div>
 		<div class="search-bar" style="width: auto; text-align: right;">
 		
 			<a class="btn btn-primary" href="../index/" style="float: left;"><span class="fui-arrow-left"></span>Home</a>

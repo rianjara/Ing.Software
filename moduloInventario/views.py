@@ -1,19 +1,15 @@
 
 from django.db.models import Q
 from moduloInventario.models import Item
-
-from django.core.context_processors import request
 from django.shortcuts import render_to_response, render
-
-from django.forms import ModelForm
 from django import forms
+from django.contrib.auth.decorators import login_required
 
-# Create your views here.
 
 def inventario(request):
     lista_items = Item.objects.all()
-    
-    return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': lista_items})
+    usuario = request.user
+    return render_to_response('InventarioFrontEnd/inventario.html',{'lista_items': lista_items, 'user': usuario})
 
 def nuevo_item(request):
     if request.method == 'POST':
@@ -27,8 +23,6 @@ def nuevo_item(request):
         if request.method != 'POST':
             form = InventarioForm()
     return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form})
-
-
 
 def editar_item(request):        
     i = Item.objects.get(pk=(request.GET['q']))
@@ -52,14 +46,11 @@ def editar_item(request):
                 return inventario(request)
     return render(request, 'InventarioFrontEnd/nuevoItem.html', {'form': form})
 
-
-
+@login_required
 def eliminar_item(request):        
     i = Item.objects.get(pk=(request.GET['q']))
     i.delete()
     return inventario(request)
-
-
 
 class InventarioForm(forms.ModelForm):   
     codigo = forms.CharField(required=True,max_length=30)
@@ -71,5 +62,4 @@ class InventarioForm(forms.ModelForm):
     
     class Meta:
         model = Item
-        
         

@@ -14,6 +14,7 @@ from django.forms.widgets import TextInput
 from moduloClientes.models import Cliente
 from django.http.response import Http404
 
+
 def ventas(request):
     list_ventas = OrdenPedido.objects.exclude(codigo_factura__isnull=True)
     return render_to_response('FacturacionFrontEnd/ventas.html',{'l_ventas': list_ventas})
@@ -107,14 +108,12 @@ def editar_orden_pedido(request):
 
 def abonos(request):
     list_abonos = Abono.objects.all()
-    usuario = request.user
-    return render_to_response('FacturacionFrontEnd/abonos.html',{'l_abonos': list_abonos, 'user': usuario})
+    return render_to_response('FacturacionFrontEnd/abonos.html',{'l_abonos': list_abonos})
 
 def validate_monto(monto):
     if monto < 0:
         raise ValidationError('El %s debe ser mayor a cero'% monto)
 
-@login_required
 def nuevo_abono(request):
     if request.method == 'POST':
         form = AbonoForm(request.POST)

@@ -7,22 +7,26 @@ from django.db.models import Q
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from django.http.response import Http404
+from django.contrib.auth.decorators import login_required
+from datetime import datetime, date
 
 
 def clientes(request):
-    list_clientes = Cliente.objects.all()    
-    return render_to_response('ClientesFrontEnd/clientes.html',{'l_clienetes': list_clientes})
+    list_clientes = Cliente.objects.all()
+    usuario = request.user
+    return render_to_response('ClientesFrontEnd/clientes.html',{'l_clienetes': list_clientes, 'user': usuario})
 
 def consultas(request):
     list_consultas = Consultas.objects.all()
-    return render_to_response('ClientesFrontEnd/consultas.html',{'l_consultas': list_consultas})
+    usuario = request.user
+    return render_to_response('ClientesFrontEnd/consultas.html',{'l_consultas': list_consultas, 'user': usuario})
 
 def nuevo_cliente(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
         if form.is_valid():
             try:
-                c = Cliente(cedula=request.POST['cedula'],nombre=request.POST['nombre'],apellido1=request.POST['apellido1'],apellido2=request.POST['apellido2'],fecha_nacimiento=request.POST['fecha_nacimiento'],telefonos=request.POST['telefonos'],direccion=request.POST['direccion'],e_mail1=request.POST['e_mail1'],e_mail2=request.POST['e_mail2'],ruc=request.POST['ruc'])
+                c = Cliente(cedula=request.POST['cedula'],nombre=request.POST['nombre'],apellido1=request.POST['apellido1'],apellido2=request.POST['apellido2'],fecha_nacimiento=date(year=int(request.POST['fecha_nacimiento_year']),month=int(request.POST['fecha_nacimiento_month']),day=int(request.POST['fecha_nacimiento_day'])),telefonos=request.POST['telefonos'],direccion=request.POST['direccion'],e_mail1=request.POST['e_mail1'],e_mail2=request.POST['e_mail2'],ruc=request.POST['ruc'])
             except MultiValueDictKeyError:
                 c = Cliente(cedula=request.POST['cedula'],nombre=request.POST['nombre'],apellido1=request.POST['apellido1'],apellido2=request.POST['apellido2'],telefonos=request.POST['telefonos'],direccion=request.POST['direccion'],e_mail1=request.POST['e_mail1'],e_mail2=request.POST['e_mail2'],ruc=request.POST['ruc'])
             c.save()
@@ -87,6 +91,7 @@ def editar_cliente(request):
                 c.nombre = request.POST['nombre']
                 c.apellido1 = request.POST['apellido1']
                 c.apellido2 = request.POST['apellido2']
+                c.fecha_nacimiento = date(year=int(request.POST['fecha_nacimiento_year']),month=int(request.POST['fecha_nacimiento_month']),day=int(request.POST['fecha_nacimiento_day']))
                 c.telefonos = request.POST['telefonos']
                 c.direccion = request.POST['direccion']
                 c.e_mail1 = request.POST['e_mail1']
@@ -95,6 +100,7 @@ def editar_cliente(request):
                 c.save()
                 return clientes(request)
     return render(request, 'ClientesFrontEnd/nuevoCliente.html', {'form': form})
+
 def editar_consulta(request):
     try:     
         cons = Consultas.objects.get(pk=int(request.GET['q']))
@@ -119,6 +125,7 @@ def editar_consulta(request):
                 return consultas(request)
     return render(request, 'ClientesFrontEnd/nuevaConsulta.html', {'form': form})
 
+@login_required
 def eliminar_cliente(request):
     try:   
         c = Cliente.objects.get(pk=int(request.GET['q']))
@@ -131,6 +138,7 @@ def eliminar_cliente(request):
         raise Http404
     return clientes(request)
 
+@login_required
 def eliminar_consulta(request):  
     try:       
         c = Consultas.objects.get(pk=int(request.GET['q']))
@@ -148,7 +156,7 @@ class ClienteForm(forms.ModelForm):
     nombre = forms.CharField(max_length=30)
     apellido1 = forms.CharField(max_length=30,required=False)
     apellido2 = forms.CharField(max_length=30,required=False)
-    fecha_nacimiento = forms.DateField(widget=SelectDateWidget(),required=False)
+    fecha_nacimiento = forms.DateField(widget=SelectDateWidget(years=range(datetime.today().year-99, datetime.today().year+1 )),required=False)
     #maximo cuatro telefonos separados por coma
     telefonos = forms.RegexField(max_length=10, regex=r'^[0-9]+')
     direccion = forms.CharField(max_length=100)

@@ -68,6 +68,20 @@
 	</script>
 
 <body onload="loadItems();">
+	<a style="display: block;
+						text-decoration: none;
+						width: 70px;
+						height: 20px;
+						background-color: khaki;
+						float: right;
+						border-radius: 10px;
+						border: 2px solid;
+						margin-right: 10px;" href="
+			{% if user.is_authenticated %}
+			    /logout">Logout</a>
+		    {% else %}
+		    	/login">Login</a>
+		    {% endif %}
 	<div class="container article" id="wrap">
 		<div class="search-bar" style="width: auto; text-align: right;">
 		{% if error %}
