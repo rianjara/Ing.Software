@@ -419,7 +419,7 @@ def nuevo_detalle_compra(request):
             return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'mensaje':form.errors,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
     else:
         form = DetalleOrdenCompraForm()
-        form.orden = Orden_Compra.objects.get(id=request.GET['orden_id'])
+        form.initial={'orden': request.GET['orden_id']}
         return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'editing': False},context_instance=RequestContext(request))
 
 def editar_detalle_compra(request):
@@ -432,17 +432,18 @@ def editar_detalle_compra(request):
     if request.method != 'POST':
         form = DetalleOrdenCompraForm(instance=i)
         form.id = request.GET['q']
+        print form.errors
         if form.is_valid():
             form.save()
     else:
         if request.method == 'POST':
             form = DetalleOrdenCompraForm(request.POST)
-            mensaje = edit_order(request.POST['id'],request.POST['orden'],request.POST['item'], request.POST['cantidad'], request.POST['valor_unitario'])
+            mensaje = edit_order_detail(request.POST['id'],request.POST['orden'],request.POST['item'], request.POST['cantidad'], request.POST['valor_unitario'])
             if mensaje.startswith("Operacion Exitosa."):
                 return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=request.POST['orden'])})
             else:
                 return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'mensaje': mensaje,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
-    return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'orden_id':form.orden})
+    return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True})
 
 class ItemForm(forms.ModelForm):   
     codigo = forms.CharField(required=True,max_length=30)
