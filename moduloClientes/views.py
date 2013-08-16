@@ -150,6 +150,14 @@ def eliminar_consulta(request):
         raise Http404
     return consultas(request)
 
+def create_nuevo_cliente(cedula,nombre,apellido1,apellido2,fecha_nacimiento,telefonos,direccion,e_mail1,e_mail2,ruc):
+    cliente = Cliente(cedula=cedula,nombre=nombre,apellido1=apellido1,apellido2=apellido2,fecha_nacimiento=fecha_nacimiento,telefonos=telefonos,direccion=direccion,e_mail1=e_mail1,e_mail2=e_mail2,ruc=ruc)
+    cliente.save()
+
+def create_nueva_consulta(cliente,esfera,cilindro,eje,av,add,dp,fecha,Diagnostico,Observaciones,vista,ojo,estado):
+    consulta = Consultas(cliente,esfera,cilindro,eje,av,add,dp,fecha,Diagnostico,Observaciones,vista,ojo,estado)
+    consulta.save()
+
 class ClienteForm(forms.ModelForm):
     id = forms.IntegerField(required=False)
     cedula = forms.RegexField(max_length=10,required=False, regex=r'^[0-9]+')
