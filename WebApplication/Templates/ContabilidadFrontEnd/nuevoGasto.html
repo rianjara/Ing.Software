@@ -1,0 +1,47 @@
+{% extends "base.html"%}
+
+{%block title%} Nuevo Cliente{% endblock%}
+{% block jscript%}
+<script src="../static/js/validar-cedula-ruc.js">
+</script>
+{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../clientes/" style="float: left;"><span class="fui-arrow-left"></span>Clientes</a>
+
+<h1>Nuevo Cliente</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+    <form action="" method="post">{% csrf_token %}
+    	<div class="field">
+            {{ form.concepto.errors }}
+            <label for="id_cedula">Concepto:</label>
+            {{ form.concepto }}
+        </div>
+  
+        <div class="field">
+            {{ form.fecha_gasto.errors }}
+            <label for="id_fecha_nacimiento">Fecha Gasto:</label>
+            {{ form.fecha_gasto }}
+        </div>
+        <div class="field">
+            {{ form.beneficiario.errors }}
+            <label for="id_telefonos">Beneficiario:</label>
+            {{ form.beneficiario }}
+        </div>        
+         
+        <div class="field">
+            {{ form.factura.errors }}
+            <label for="id_ruc">Factura:</label>
+            {{ form.factura }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Guardar Gasto" onclick="validarDocumento(cedula);">
+    </form>
+   </div>
+{% endblock%}

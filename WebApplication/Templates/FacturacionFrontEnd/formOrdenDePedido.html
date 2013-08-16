@@ -4,58 +4,132 @@
 {% block jscript%}
 <script src="../static/js/validar-cedula-ruc.js">
 </script>
+<script type="text/javascript">
+	function auto_calculate_formula(tableId) {
+		var table = document.getElementById(tableId);
+		var tableLen = table.rows.length;
+		var row = null;
+		
+		for (var n = 0; n < tableLen; n++){
+			row = table.rows[n];
+			if(row.getElementsByTagName("input").length != 0)
+				row.getElementsByTagName("input")[3].value=row.getElementsByTagName("input")[0].value*row.getElementsByTagName("input")[2].value;
+		}
+	}
+	function loopSelected()
+	{
+		var selectedArray = new Array();
+		var selObj = document.getElementById('id_items');
+		var i;
+		var count = 0;		
+		var table = document.getElementById('formset');
+		var tableLen = table.rows.length;
+		var row = null;
+		
+		for (i=0; i<selObj.options.length; i++) {
+			if (selObj.options[i].selected) {
+				selectedArray[count] = selObj.options[i].value;	
+				count++;
+			}
+		}
+		
+		for (var n = 1; n < tableLen; n++){
+			row = table.rows[n];
+			if((n-1) < selectedArray.length){
+				row.getElementsByTagName("input")[0].value = 0;
+				row.getElementsByTagName("input")[1].value = selectedArray[n-1];
+				row.getElementsByTagName("input")[2].value = "0.00";
+			}else{
+				row.getElementsByTagName("input")[0].value = '';
+				row.getElementsByTagName("input")[1].value = '';
+				row.getElementsByTagName("input")[2].value = "";
+			}
+		}
+		//txtSelectedValuesObj.value = selectedArray;
+	}
+</script>
 {% endblock%}
 
 {% block content%}
 <div class="container article" id="wrap">
-<a class="btn btn-primary" href="../clientes/" style="float: left;"><span class="fui-arrow-left"></span>Clientes</a>
+<a class="btn btn-primary" href="../ordenesDePedido/" style="float: left;"><span class="fui-arrow-left"></span>Ordenes de Pedido</a>
 
 <h1>Nueva Orden de Compra</h1>
 
-    {% if form.errors %}
+    {% if orden_form.errors %}
         <p style="color: red;">
-            Please correct the error below: {{ form.errors|pluralize }}.
+            Please correct the error below: {{ orden_form.errors|pluralize }}.
         </p>
     {% endif %}
 
     <form action="" method="post">{% csrf_token %}
-    
     	<div class="field">
-            {{ form.codigo.errors }}
+            {{ orden_form.codigo.errors }}
             <label for="id_codigo">C&oacute;digo:</label>
-            {{ form.codigo }}
+            {{ orden_form.codigo }}
         </div>
         <div class="field">
-            {{ form.codigo_factura.errors }}
+            {{ orden_form.codigo_factura.errors }}
             <label for="id_codigo_factura">Factura Asociada:</label>
-            {{ form.codigo_factura }}
-        </div>        
+            {{ orden_form.codigo_factura }}
+        </div>     
         <div class="field">
-            {{ form.fecha_compra.errors }}
+            {{ orden_form.fecha_compra.errors }}
             <label for="id_fecha_compra">Fecha de Compra:</label>
-            {{ form.fecha_compra }}
+            {{ orden_form.fecha_compra }}
         </div>
         <div class="field">
-            {{ form.fecha_nacimiento.errors }}
+            {{ orden_form.fecha_facturacion.errors }}
             <label for="id_fecha_facturacion">Fecha de Entrega:</label>
-            {{ form.fecha_nacimiento }}
+            {{ orden_form.fecha_facturacion }}
         </div>
+    
         <div class="field">
-            {{ form.cliente.errors }}
+            {{ orden_form.cliente.errors }}
             <label for="id_cliente">Cliente:</label>
-            {{ form.cliente }}
+            {{ orden_form.cliente }}
         </div>        
         <div class="field">
-            {{ form.items.errors }}
+            {{ orden_form.items.errors }}
             <label for="id_items">Items:</label>
-            {{ form.items }}
-        </div>        
-        <div class="field">
-            {{ form.detalle.errors }}
+            {{ orden_form.items }}
+            <input type="button" class="btn btn-primary" value="Agregar a Items" onclick="loopSelected();" />
+        </div>
+          
+        {# tabla items #}
+        
+        {{ formset.management_form}}
+        {{ formset.non_form_errors.as_ul }}
+        <div>
+			<table id="formset" class="form" onkeyup="auto_calculate_formula('formset')">
+			{% for form in formset.forms %}
+			  {% if forloop.first %}
+			  <thead><tr>
+			    {% for field in form.visible_fields %}
+			    <th>{{ field.label|capfirst }}</th>
+			    {% endfor %}
+			  </tr></thead>
+			  {% endif %}
+			  <tr class="{% cycle row1,row2 %}" width=50>
+			  {% for field in form.visible_fields %}
+			    <td>
+			    {# Include the hidden fields in the form #}
+			    {#{% if forloop.first %}{% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}{% endif %}#}
+			      {{ field.errors.as_ul }}
+			      {{ field }}
+			    </td>
+			  {% endfor %}
+			  </tr>
+			{% endfor %}
+			</table>
+		</div>
+		{# tabla items #}
+		
+        <div style="width:100%">
+            {{ orden_form.detalle.errors }}
             <label for="id_detalle">Detalle:</label>
-            {{ form.detalle }}
+            {{ orden_form.detalle }}
         </div>
         <input type="submit" class="btn btn-primary" value="Guardar Orden de Pedido" >
     </form>
-   </div>
 {% endblock%}

@@ -49,13 +49,13 @@ TIPO_PAGO_CHOICES = (('EFECTIVO', 'Efectivo'),
                   ,)
 
 class OrdenPedido(models.Model):
-    codigo = models.CharField(primary_key=True, max_length=10)
+    codigo = models.CharField(primary_key=True,max_length=10, unique=True)
     codigo_factura = models.CharField(null=True, max_length=20)
     fecha_compra = models.DateField()
     fecha_facturacion = models.DateField(null=True)#poner la fecha actual por defecto
     cliente = models.ForeignKey(Cliente)
     items = models.ManyToManyField(Item, through='Item_OrdenPedido_Cantidad')
-    detalle = models.CharField(null=True, max_length=30)
+    detalle = models.TextField(null=True, max_length=50)
     
     def __str__(self):
         return '%s'% (self.codigo)
@@ -75,6 +75,9 @@ class Item_OrdenPedido_Cantidad(models.Model):
     precio_venta_unitario = models.DecimalField(max_digits=8, decimal_places=4)
     #porcentaje validado en front end que sea menor que 100
     porcentaje_descuento = models.DecimalField(null=True,max_digits=8, decimal_places=4 )
+    
+    def __str__(self):
+        return '<%s,%s,%d>'% (self.item,self.orden_pedido,self.cantidad)
     
     class Admin:
         pass

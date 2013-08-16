@@ -4,14 +4,13 @@
 
 {% block content%}
 <style>
-	.article{
-		height: 700px;
+	.article{padding-bottom: 150px;
 	}
 
 	.menu-icon{
 		float: left;
 		max-width: 256px;
-		max-height: 500px;
+		max-height: 1024px;
 		padding: 0;
 		margin: 0;
 	}
@@ -25,52 +24,142 @@
 		-ms-transform: scale(0.5); /* IE 9 */
 		-webkit-transform: scale(0.5); /* Safari and Chrome */
 	}
+	
+	.module{
+		display: block;
+		clear: both;
+		padding-top: 50px;
+	}
 </style>
+<a style="display: block;
+					text-decoration: none;
+					width: 70px;
+					height: 20px;
+					background-color: khaki;
+					float: right;
+					border-radius: 10px;
+					border: 2px solid;
+					margin-bottom: 20px;" href="
+		{% if user.is_authenticated %}
+		    /logout">Logout</a>
+	    {% else %}
+	    	/login">Login</a>
+	    {% endif %}
 
 <div class="container article" id="wrap">
 		<h1>
 			Sistema &Oacute;ptica
 			<small>Men&uacute; Principal</small>
 		</h1>
-
-	<a href="../clientes/">
-		<div class="menu-icon">
-			<img src="../static/flat_miniset/admin.png">
-			<div class="tooltip fade bottom in">
-				<div class="tooltip-arrow" style></div>
-			<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Clientes</div>
+	
+	<div class="module" style="padding-top: 0px;">
+		<hr>
+		<h2>M&oacute;dulo Clientes</h2>
+		<a href="../clientes/">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/admin.png" alt="clientes">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Clientes</div>
+				</div>
 			</div>
-		</div>
-	</a>
-
-	<a href="../consultas/">
-		<div class="menu-icon">
-			<img src="../static/flat_miniset/clipboard.png">
-			<div class="tooltip fade bottom in">
-				<div class="tooltip-arrow" style></div>
-			<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Consulta</div>
+		</a>
+	
+		<a href="../consultas/">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/clipboard.png" alt="consultas m&eacute;dicas">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Consultas M&eacute;dicas</div>
+				</div>
 			</div>
-		</div>
-	</a>
-
-	<a href="">
-		<div class="menu-icon">
-			<img src="../static/flat_miniset/folder2.png">
-			<div class="tooltip fade bottom in">
-				<div class="tooltip-arrow" style></div>
-			<a href="../clientes/"><div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Historia Cl&iacute;nica</div></a>
+		</a>
+	
+		<a href="#">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/folder2.png" alt="historia cl&iacute;nica">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+					<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Historia Cl&iacute;nica</div>
+				</div>
+			</div>		
+		</a>
+	</div>
+	<div class="module">
+		<hr>
+		<h2>M&oacute;dulo Inventario</h2>
+		<a href="../inventario/">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/boxes.png" alt="inventario">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Inventario</div>
+				</div>
 			</div>
-		</div>		
-	</a>
-
-	<a href="../inventario/">
-		<div class="menu-icon">
-			<img src="../static/flat_miniset/boxes.png">
-			<div class="tooltip fade bottom in">
-				<div class="tooltip-arrow" style></div>
-			<a href="../clientes/"><div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Inventario</div></a>
+		</a>
+		
+		<a href="#">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/proveedores.png" alt="proveedores">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Proveedores</div>
+				</div>
 			</div>
-		</div>
-	</a>
+		</a>
+	</div>
+	<div class="module">
+		<hr>
+		<h2>M&oacute;dulo Contable</h2>
+		<a href="../ordenesDePedido/">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/facturacion.png" alt="facturacion">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Facturaci&oacute;n</div>
+				</div>
+			</div>
+		</a>
+		
+		<a href="../abonos/">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/cuentas_por_cobrar.png" alt="cuentas por cobrar">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Cuentas por Cobrar</div>
+				</div>
+			</div>
+		</a>
+		
+		<a href="../cuentas_por_pagar/">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/cuentas_por_pagar.png" alt="cuentas por pagar">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Cuentas por Pagar</div>
+				</div>
+			</div>
+		</a>
+		
+		<a href="../gastos/">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/gastos.png" alt="gastos">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Gastos</div>
+				</div>
+			</div>
+		</a>
+		
+		<a href="../estado_perdidas_ganancias/">
+			<div class="menu-icon">
+				<img src="../static/flat_miniset/estado_perdidas_ganancias.png" alt="estado perdidas ganacias">
+				<div class="tooltip fade bottom in">
+					<div class="tooltip-arrow" style></div>
+				<div class="tooltip-inner" style="top: 0px; left: 20px; position: relative;">Estado Perdidas Ganacias</div>
+				</div>
+			</div>
+		</a>
+	</div>
 </div>
 {% endblock%}

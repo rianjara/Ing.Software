@@ -20,6 +20,7 @@ class Cliente(models.Model):
         return  [(field.name, field.value) for field in Cliente._meta.fields]
         
     class Meta:
+        db_table = 'Cliente'
         ordering =["nombre"]
                 
     class Admin():
@@ -44,4 +45,5 @@ class Consultas(models.Model):
     estado = models.CharField(choices=ESTADO_CHOICES,max_length=15)
     
     class Meta:
+        db_table = 'Consulta'
         ordering=["fecha"]
