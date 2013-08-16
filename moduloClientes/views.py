@@ -1,12 +1,12 @@
 # Create your views here.
 from moduloClientes.models import Cliente, Consultas
 from django.shortcuts import render_to_response, render
+from django.core.exceptions import ValidationError
 from django.utils.datastructures import MultiValueDictKeyError
 from django.db.models import Q
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
 from django.http.response import Http404
-from datetime import datetime
 
 
 def clientes(request):
@@ -36,11 +36,13 @@ def nueva_consulta(request):
     if request.method == 'POST':
         form = ConsultaForm(request.POST)
         if form.is_valid():
+            c=Cliente.objects.get(pk=request.POST('cliente'))
             try:
-                con = Consultas(esfera=request.POST['esfera'],cilindro=request.POST['cilindro'],eje=request.POST['eje'],av=request.POST['av'],add=request.POST['add'],dp=request.POST['dp'],fecha=request.POST['fecha'],Diagnostico=request.POST['Diagnostico'],Observaciones=request.POST['Observaciones'],vista=request.POST['vista'],ojo=request.POST['ojo'],estado=request.POST['estado'])
+                con = Consultas(cliente=c,esfera=request.POST['esfera'],cilindro=request.POST['cilindro'],eje=request.POST['eje'],av=request.POST['av'],add=request.POST['add'],dp=request.POST['dp'],fecha=request.POST['fecha'],Diagnostico=request.POST['Diagnostico'],Observaciones=request.POST['Observaciones'],vista=request.POST['vista'],ojo=request.POST['ojo'],estado=request.POST['estado'])
             except MultiValueDictKeyError:
-                con = Consultas(esfera=request.POST['esfera'],cilindro=request.POST['cilindro'],eje=request.POST['eje'],av=request.POST['av'],add=request.POST['add'],dp=request.POST['dp'],Diagnostico=request.POST['Diagnostico'],Observaciones=request.POST['Observaciones'])
-            con.save()
+                con = Consultas(cliente=c,esfera=request.POST['esfera'],cilindro=request.POST['cilindro'],eje=request.POST['eje'],av=request.POST['av'],add=request.POST['add'],dp=request.POST['dp'],Diagnostico=request.POST['Diagnostico'],Observaciones=request.POST['Observaciones'],vista=request.POST['vista'],ojo=request.POST['ojo'],estado=request.POST['estado'])
+            except MultiValueDictKeyError:
+                con.save()
             return consultas(request)
     else:
         if request.method != 'POST':
@@ -93,6 +95,29 @@ def editar_cliente(request):
                 c.save()
                 return clientes(request)
     return render(request, 'ClientesFrontEnd/nuevoCliente.html', {'form': form})
+def editar_consulta(request):
+    try:     
+        cons = Consultas.objects.get(pk=int(request.GET['q']))
+    except Exception:
+        raise Http404
+    
+    if request.method != 'POST':
+        if cons:
+            form = ConsultaForm(instance=cons)
+            form.id = int(request.GET['q'])
+            if form.is_valid():
+                form.save()
+        else:
+            raise Http404
+    else:
+        if request.method == 'POST':
+            form = ConsultaForm(request.POST)
+            if form.is_valid():
+                cons.estado = request.POST['estado']
+           
+                cons.save()
+                return consultas(request)
+    return render(request, 'ClientesFrontEnd/nuevaConsulta.html', {'form': form})
 
 def eliminar_cliente(request):
     try:   
@@ -123,7 +148,7 @@ class ClienteForm(forms.ModelForm):
     nombre = forms.CharField(max_length=30)
     apellido1 = forms.CharField(max_length=30,required=False)
     apellido2 = forms.CharField(max_length=30,required=False)
-    fecha_nacimiento = forms.DateField(widget=SelectDateWidget(years=range(datetime.today().year-99, datetime.today().year+1 )),required=False)
+    fecha_nacimiento = forms.DateField(widget=SelectDateWidget(),required=False)
     #maximo cuatro telefonos separados por coma
     telefonos = forms.RegexField(max_length=10, regex=r'^[0-9]+')
     direccion = forms.CharField(max_length=100)
@@ -133,35 +158,74 @@ class ClienteForm(forms.ModelForm):
     
     class Meta:
         model = Cliente
+
+def validate_cilindro(value):
+    if value > 0:
+        raise ValidationError('%s debe ser un numero negativo'% value)
     
+def validate_eje(value):
+    if value >180:
+        raise ValidationError('%s es un numero mayor a 180 grados'% value)
+    if value <0:
+        raise ValidationError('%s no puede ser un numero negativo'% value)    
+
+def validate_add(value):
+    if value <0:
+        raise ValidationError('%s no puede ser un numero negativo'% value)
+
+def validate_dp(value):
+    if value <0:
+        raise ValidationError('%s no puede ser un numero negativo'% value)
+
 class ConsultaForm(forms.ModelForm):
     id = forms.IntegerField(required=False)
-  
     VISTA_CHOICES = (
-                     ('1', 'LEJOS'),
-                     ('2', 'CERCA'),
+                     ('LEJOS', 'LEJOS'),
+                     ('CERCA', 'CERCA'),
                      )
     OJO_CHOICES = (
-                   ('1', 'DERECHO'),
-                   ('2', 'IZQUIERDO'),
+                   ('DERECHO', 'DERECHO'),
+                   ('IZQUIERDO', 'IZQUIERDO'),
                    )
+    
     ESTADO_CHOICES = (
-                   ('1', 'PENDIENTE'),
-                   ('2', 'REALIZADA'),
+                   ('PENDIENTE', 'PENDIENTE'),
+                   ('REALIZADA', 'REALIZADA'),
                    )
-    esfera=forms.DecimalField(max_digits=5,decimal_places=3)
-    cilindro=forms.DecimalField(max_digits=5,decimal_places=3)
-    eje=forms.CharField(max_length=30)
-    av=forms.DecimalField(max_digits=5,decimal_places=3)
-    add=forms.DecimalField(max_digits=5,decimal_places=3)
-    dp=forms.DecimalField(max_digits=5,decimal_places=3)
-    fecha=forms.DateField(widget=SelectDateWidget(),required=False)
-    Diagnostico = forms.CharField(widget=forms.Textarea,required=False)
-    Observaciones = forms.CharField(widget=forms.Textarea,required=False)
+    AV_CHOICES = (
+                   ('2.0', '20/10'),
+                   ('6.66', '20/13'),
+                   ('1.33', '20/15'),
+                   ('1.0', '20/20'),
+                   ('0.8', '20/25'),
+                   ('0.66', '20/30'),  
+                   ('0.5', '20/40'),
+                   ('0.4', '20/50'), 
+                   ('0.28', '20/70'),  
+                   ('0.2', '20/100'),
+                   ('0.1', '20/200'),
+                   )
+    
+    cliente=forms.ModelChoiceField(queryset=Cliente.objects.all())
     vista = forms.ChoiceField(choices=VISTA_CHOICES)
     ojo = forms.ChoiceField(choices=OJO_CHOICES)      
     estado = forms.ChoiceField(choices=ESTADO_CHOICES)
+    esfera=forms.DecimalField(max_digits=5,decimal_places=3)
+    cilindro=forms.DecimalField(max_digits=5,decimal_places=3,validators=[validate_cilindro])
+    eje=forms.IntegerField(validators=[validate_eje])
+    av=forms.ChoiceField(choices=AV_CHOICES)
     
+    add=forms.DecimalField(max_digits=5,decimal_places=3)
+    
+        
+    dp=forms.DecimalField(max_digits=5,decimal_places=3)
+    
+    fecha=forms.DateField(widget=SelectDateWidget(),required=False)
+    Diagnostico = forms.CharField(widget=forms.Textarea,required=False)
+    Observaciones = forms.CharField(widget=forms.Textarea,required=False)
+   
+   
+
     class Meta:
         model = Consultas
 

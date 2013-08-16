@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <!-- Basic Page Needs
+      ================================================== -->
+        <meta charset="utf-8">
+        <title>Login</title>
+        <meta name="description" content="">
+        <meta name="author" content="Richard Jara">
+
+        <!-- Mobile Specific Metas
+      ================================================== -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+        <!-- CSS -->
+        <link rel="stylesheet" type="text/css" href="../static/css/login.css" />
+
+        <!--[if lt IE 9]>
+                    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+            <![endif]-->
+    </head>
+    <body>
+
+        <div class="container">
+            <div class="flat-form">
+                <div class="tabs">
+                    <h1>Login Optica Santander</h1>
+                </div>
+                <div id="login" class="form-action">
+                    <p>
+                        Sistema Optica Santander, por favor ingrese sus credenciales para ingresar a la aplicación.
+                    </p>
+                    <form method="post" action="">{%csrf_token %}
+                    
+                    <table>{{form}}</table>
+                    <!--
+                        <ul>
+                            <li>
+                                <input name="usuario" type="text" placeholder="Usuario" />
+                            </li>
+                            <li>
+                                <input name="password" type="password" placeholder="Contraseña" />
+                            </li>
+                            <li>
+                                <input type="submit" value="Entrar" class="button" />
+                            </li>
+                        </ul>
+                    -->
+                    <input type="submit" value="Entrar" class="button" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+

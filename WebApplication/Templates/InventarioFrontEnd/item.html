@@ -1,0 +1,55 @@
+{% extends "base.html"%}
+
+{%block title%} {%if editing %}Editar{%else%}Nuevo{%endif%} Item{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../inventario/" style="float: left;"><span class="fui-arrow-left"></span>Inventario</a>
+
+<h1>{%if editing %}Editar{%else%}Nuevo{%endif%} Item</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Parece que olvido ingresar alguna informacion, por favor intentelo de nuevo.
+        </p>
+    {% endif %}
+	{% if None != mensaje %}
+    	<p id="mensaje" style="color: red;">{{ mensaje }}</p>
+    {% endif %}
+    <form action="" method="post">{% csrf_token %}
+    	<div class="field">
+            {{ form.codigo.errors }}<label for="codigo">Codigo:</label>{{ form.codigo }}
+        </div>
+        <div class="field">
+            {{ form.nombre.errors }}<label for="nombre">Nombre:</label>{{ form.nombre }}
+        </div>        
+        <div class="field">
+            {{ form.descripcion.errors }}<label for="descripcion">Descripcion:</label>{{ form.descripcion }}
+        </div>
+        <div class="field">
+            {{ form.categoria.errors }}<label for="categoria">Categoria:</label>{{ form.categoria }}
+        </div>
+        <div class="field">
+            {{ form.proveedor.errors }}<label for="proveedor">Proveedor:</label>{{ form.proveedor }}
+        </div>
+        <div class="field">
+            {{ form.costo_compra.errors }}<label for="costo_compra">Costo Compra:</label>{{ form.costo_compra }}
+        </div>
+        <div class="field">
+            {{ form.costo_venta.errors }}<label for="costo_venta">Costo Venta:</label>{{ form.costo_venta }}
+        </div>
+        <div class="field">
+            {{ form.fecha_compra.errors }}<label for="fecha_compra">Fecha Compra:</label>{{ form.fecha_compra }}
+        </div>
+        <div class="field">
+            {{ form.cantidad.errors }}<label for="cantidad">Cantidad:</label>{{ form.cantidad }}
+        </div>
+        {%if editing %}
+        	<div class="field">
+	            {{ form.cantidad.errors }}<label for="circulando">Activo:</label>{{ form.circulando }}
+	        </div>
+        {%endif%}
+        <input type="submit" class="btn btn-primary" value="Guardar item" >
+    </form>
+   </div>
+{% endblock%}
