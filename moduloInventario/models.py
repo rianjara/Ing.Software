@@ -44,7 +44,7 @@ class Item(models.Model):
         return '%s'% (self.nombre)
     
     class Meta:
-        db_table = 'Items'
+        db_table = 'Item'
         ordering = ['codigo']
     
 class Orden_Compra(models.Model):
@@ -52,7 +52,9 @@ class Orden_Compra(models.Model):
     factura = models.IntegerField(null=False)
     fecha = models.DateField(null=False)
     valor_total = models.FloatField(null=False)
-    detalle_orden_compra = models.ManyToManyField(Item,through='Detalle_Orden_Compra')
+    
+    def __str__(self):
+        return '%d'% (self.id)
     
     class Meta:
         db_table = 'Compras'
@@ -60,9 +62,12 @@ class Orden_Compra(models.Model):
     
 class Detalle_Orden_Compra(models.Model):
     item = models.ForeignKey(Item)
-    orden = models.ForeignKey(Orden_Compra, related_name='orden')
+    orden = models.ForeignKey(Orden_Compra)
     cantidad = models.IntegerField(null=False)
     valor_unitario = models.FloatField(null=False)
+        
+    def __str__(self):
+        return '%d - %s'%(self.orden.id,self.item)
     
     class Meta:
         db_table = 'Detalles_Compras'

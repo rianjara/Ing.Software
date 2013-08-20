@@ -60,6 +60,7 @@ def save_item_cantidad(codigo,item,cantidad,precio_unitario):
     item1.save(force_insert=True)
     
 def save_items_x_cantidad_in_orden(request):
+    Item_OrdenPedido_Cantidad.objects.filter(orden_pedido=request.POST['codigo']).delete()
     for i in range(10-1):
         prefix = 'item_ordenpedido_cantidad_set-%d'% i
         

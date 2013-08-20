@@ -21,6 +21,11 @@
     <form action="" method="post">{% csrf_token %}
     
     	<div class="field">
+            {{ form.cliente.errors }}
+            <label for="id_esfera">Cliente:</label>
+            {{ form.cliente }}
+        </div>
+    	<div class="field">
             {{ form.esfera.errors }}
             <label for="id_esfera">Esfera:</label>
             {{ form.esfera }}

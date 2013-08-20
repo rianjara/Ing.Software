@@ -1,10 +1,12 @@
 from django.contrib import admin
 from WebApplication.views import index, error404
 from moduloInventario.views import inventario, nuevo_item, editar_item,\
-    eliminar_item
+    ordenes_compras, nueva_orden_compra, editar_orden_compra,\
+    nuevo_detalle_compra, editar_detalle_compra
 from django.conf.urls import patterns, url, include
 from moduloClientes.views import clientes, buscar_form, buscar_cliente,\
-    nuevo_cliente, editar_cliente, eliminar_cliente, consultas, nueva_consulta
+    nuevo_cliente, editar_cliente, eliminar_cliente, consultas, nueva_consulta,\
+    marcar_consulta, historia_clinica, buscar_historia_clinica
 from moduloFacturacion.views import abonos, nuevo_abono, nueva_orden_pedido,\
     editar_orden_pedido, ordenes_pedido
 from moduloAutenticacion.views import login, logout
@@ -23,14 +25,21 @@ urlpatterns = patterns('',
                        url(r'^nuevo_cliente/$', nuevo_cliente),
                        url(r'^editarCliente/$', editar_cliente),
                        url(r'^eliminarCliente/$', eliminar_cliente),
-                       #Modulo Clientes configuracion url_path para funionalidad consultas
+                       #Modulo Clientes configuracion url_path para funionalidad consultas                                              
                        url(r'^consultas/$', consultas),
-                       url(r'^nuevaConsulta/$', nueva_consulta),
+                       url(r'^nuevaConsulta/$', nueva_consulta),                  
+                       url(r'^marcarConsultaYaRealizada/$', marcar_consulta),
+                       url(r'^buscarHistoriaClinica/$', buscar_historia_clinica),
+                       url(r'^historiaClinica/$', historia_clinica),
                        #Modulo Inventario configuracion url_path para funionalidad items
                        url(r'^inventario/$', inventario),
                        url(r'^nuevoItem/$', nuevo_item),
-                       url(r'^editarItem/$', editar_item),
-                       url(r'^eliminarItem/$', eliminar_item),                       
+                       url(r'^editarItem/$', editar_item),                       
+                       url(r'^ordenesCompra/$',ordenes_compras),
+                       url(r'^nuevaOrdenCompra/$',nueva_orden_compra),
+                       url(r'^editarOrdenCompra/$',editar_orden_compra),
+                       url(r'^nuevoDetalleCompra/$',nuevo_detalle_compra),
+                       url(r'^editarDetalleCompra/$',editar_detalle_compra),                    
                        #Modulo Contabilidad configuracion url_path para funionalidad abonos
                        url(r'^abonos/$', abonos),
                        url(r'^nuevoAbono/$', nuevo_abono),

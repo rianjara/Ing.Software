@@ -9,6 +9,7 @@ from django.forms.extras.widgets import SelectDateWidget
 from django.http.response import Http404
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, date
+from django.contrib.admin.templatetags.admin_list import register
 
 
 def clientes(request):
@@ -21,6 +22,25 @@ def consultas(request):
     usuario = request.user
     return render_to_response('ClientesFrontEnd/consultas.html',{'l_consultas': list_consultas, 'user': usuario})
 
+def buscar_historia_clinica(request):
+    clients = Cliente.objects.all()
+    return render(request, 'ClientesFrontEnd/buscarHistoriaClinica.html',{'l_clientes':clients})
+
+def historia_clinica(request):
+    
+    if 'q' in request.GET and request.GET['q']:
+        #q = decode_id(request.GET['q'])
+        q = request.GET['q']
+        cliente_c = Cliente.objects.filter(id=int(q))[0]
+        l_consultas = Consultas.objects.filter(cliente=cliente_c)
+        
+        if l_consultas :
+            return render(request,'ClientesFrontEnd/historiaClinica.html',{'l_consultas': l_consultas})
+        else:
+            return render(request, 'ClientesFrontEnd/buscarHistoriaClinica.html', {'l_clientes':clientes,'error': True})
+    else:
+        raise Http404
+        
 def nuevo_cliente(request):
     if request.method == 'POST':
         form = ClienteForm(request.POST)
@@ -40,13 +60,12 @@ def nueva_consulta(request):
     if request.method == 'POST':
         form = ConsultaForm(request.POST)
         if form.is_valid():
-            c=Cliente.objects.get(pk=request.POST('cliente'))
+            c=Cliente.objects.filter(pk=request.POST['cliente'])[0]
             try:
-                con = Consultas(cliente=c,esfera=request.POST['esfera'],cilindro=request.POST['cilindro'],eje=request.POST['eje'],av=request.POST['av'],add=request.POST['add'],dp=request.POST['dp'],fecha=request.POST['fecha'],Diagnostico=request.POST['Diagnostico'],Observaciones=request.POST['Observaciones'],vista=request.POST['vista'],ojo=request.POST['ojo'],estado=request.POST['estado'])
+                con = Consultas(cliente=c,esfera=request.POST['esfera'],cilindro=request.POST['cilindro'],eje=request.POST['eje'],av=request.POST['av'],add=request.POST['add'],dp=request.POST['dp'],fecha=date(year=int(request.POST['fecha_year']),month=int(request.POST['fecha_month']),day=int(request.POST['fecha_day'])),Diagnostico=request.POST['Diagnostico'],Observaciones=request.POST['Observaciones'],vista=request.POST['vista'],ojo=request.POST['ojo'],estado=request.POST['estado'])
             except MultiValueDictKeyError:
                 con = Consultas(cliente=c,esfera=request.POST['esfera'],cilindro=request.POST['cilindro'],eje=request.POST['eje'],av=request.POST['av'],add=request.POST['add'],dp=request.POST['dp'],Diagnostico=request.POST['Diagnostico'],Observaciones=request.POST['Observaciones'],vista=request.POST['vista'],ojo=request.POST['ojo'],estado=request.POST['estado'])
-            except MultiValueDictKeyError:
-                con.save()
+            con.save()
             return consultas(request)
     else:
         if request.method != 'POST':
@@ -100,6 +119,21 @@ def editar_cliente(request):
                 c.save()
                 return clientes(request)
     return render(request, 'ClientesFrontEnd/nuevoCliente.html', {'form': form})
+
+def marcar_consulta(request):
+    try:     
+        cons = Consultas.objects.get(pk=int(request.GET['q']))
+    except Exception:
+        raise Http404
+    
+    if request.method == 'GET':
+        if cons:
+            #Esto marca al estado como 'REALIZADA'
+            cons.estado = Consultas.ESTADO_CHOICES[1][0]
+            cons.save()
+        else:
+            raise Http404
+    return consultas(request)
 
 def editar_consulta(request):
     try:     
@@ -237,13 +271,10 @@ class ConsultaForm(forms.ModelForm):
     dp=forms.DecimalField(max_digits=5,decimal_places=3)
     
     fecha=forms.DateField(widget=SelectDateWidget(),required=False)
-    Diagnostico = forms.CharField(widget=forms.Textarea,required=False)
-    Observaciones = forms.CharField(widget=forms.Textarea,required=False)
+    Diagnostico = forms.CharField(widget=forms.Textarea(attrs={'cols':'100','rows':'4'}),required=False)
+    Observaciones = forms.CharField(widget=forms.Textarea(attrs={'cols':'100','rows':'4'}),required=False)
    
    
 
     class Meta:
-        model = Consultas
-
-class BuscarForm(forms.Form):
-    query = forms.CharField()
+        model = Consultas 

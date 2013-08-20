@@ -1,6 +1,7 @@
 from django.db import models
 
 class Cliente(models.Model):
+    
     cedula = models.CharField(max_length=10,null=True)
     nombre = models.CharField(max_length=30)
     apellido1 = models.CharField(max_length=30,null=True)
@@ -18,7 +19,7 @@ class Cliente(models.Model):
     
     def get_fields(self):
         return  [(field.name, field.value) for field in Cliente._meta.fields]
-        
+            
     class Meta:
         db_table = 'Cliente'
         ordering =["nombre"]

@@ -49,17 +49,17 @@
 	<script type="text/javascript">
 	{% if None != mensaje %}mostrarMensaje("{{mensaje}}");{% endif %}
 	var ajaxRequest;  // The variable that makes Ajax possible!
-	function loadItems(){
-		items = document.getElementById("items");
+	function loadOrdenCompra(){
+		detalles = document.getElementById("detail");
 		var lenght = 100;
 
-		if(items){
-			{% for item in lista_items %}
+		if(detalles){
+			{% for detalle in lista %}
 				tRow = document.createElement('tr');
-				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarItem?q={{item.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
-				btnElim = "<a class=\"btn btn-danger\" href=\"javascript:void(0)\" onclick=\"eliminarItem('{{item.id}}');\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
-				tRow.innerHTML = "<td>{{item.codigo}}</td><td>{{item.nombre}}</td><td>{{item.descripcion}}</td><td>{{item.categoria}}</td><td>{{item.proveedor}}</td><td>{{item.costo_unitario}}</td><td>{{item.cantidad}}</td><td>{{item.getIsActive}}</td>"+"<td width=\"50\">"+btnEdit+btnElim+"</td>";
-				items.appendChild(tRow);
+				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarDetalleCompra?q={{detalle.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
+				btnElim = "<a class=\"btn btn-danger\" href=\"javascript:void(0)\" onclick=\"eliminarOrdenCompra('{{detalle.id}}');\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
+				tRow.innerHTML = "<td>{{detalle.item.codigo}}</td><td>{{detalle.item}}</td><td>{{detalle.cantidad}}</td><td>{{detalle.valor_unitario}}</td>"+"<td width=\"50\">"+btnEdit+btnElim+"</td>";
+				detalles.appendChild(tRow);
 				lenght++;			    
 			{% endfor %}
 		}
@@ -72,7 +72,7 @@
 		   	  mostrarMensaje(ajaxRequest.responseText);
 		   }
 		}
-		ajaxRequest.open("GET", "/eliminarItem?q=" + id, false);
+		ajaxRequest.open("GET", "/eliminarDetalleCompra?q=" + id, false);
  		ajaxRequest.send(null);
 	}
 	
@@ -92,36 +92,32 @@
 	
 	function mostrarMensaje(string){
 		alert(string);
-		document.location.href = "/inventario/";
+		//document.location.href = "/ordenesCompra/";
 	}
 
 	</script>
-<body onload="loadItems();">
+<body onload="loadOrdenCompra();">
 	<div class="container article" id="wrap">
 		<div class="search-bar" style="width: auto; text-align: right;">
-		<a class="btn btn-primary" href="../index/" style="float: left;"><span class="fui-arrow-left"></span>Inicio</a>
+		<a class="btn btn-primary" href="../ordenesCompra/" style="float: left;"><span class="fui-arrow-left"></span>Ver Ordenes de Compra</a>
 		<form action="" method="get">
 	          <input name="string_search" type="text" value="{{string_busqueda}}" placeholder="Buscar" class="span3" />
 	          <input class="btn btn-primary" type="submit" value="Buscar">
 		</form>
 		</div>
 		<br>
-        <a class="btn btn-primary btn-nuevo" href="../nuevoItem/"><span class="fui-plus"></span> Nuevo Item</a>
+        <a class="btn btn-primary btn-nuevo" href="../nuevoDetalleCompra?orden_id={{orden_id}}"><span class="fui-plus"></span> Agregar item a la compra</a>
         <br>
 		<div class="conatiner">
 			<table>
 				<thead>
 					<tr>
-						<th>Codigo</th><th>Item</th><th>Descripcion</th><th>Categoria</th><th>Proveedor</th><th>Costo</th><th>Cantidad</th><th>Activo</th>
+						<th>Codigo</th><th>Item</th><th>Cantidad</th><th>Valor Unitario</th>
 					</tr>
 				</thead>
-				<tbody id="items">
+				<tbody id="detail">
 				</tbody>
-				
 			</table>
 		</div>
-
-
 	</div>
-
 </body>
