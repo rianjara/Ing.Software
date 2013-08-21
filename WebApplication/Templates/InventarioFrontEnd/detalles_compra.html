@@ -47,7 +47,7 @@
 	}
 	</style>
 	<script type="text/javascript">
-	{% if None != mensaje %}mostrarMensaje("{{mensaje}}","{{orden}}");{% endif %}
+	{% if None != mensaje %}mostrarMensaje("{{mensaje}}");{% endif %}
 	var ajaxRequest;  // The variable that makes Ajax possible!
 	function loadOrdenCompra(){
 		detalles = document.getElementById("detail");
@@ -55,7 +55,7 @@
 			{% for detalle in lista %}
 				tRow = document.createElement('tr');
 				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarDetalleCompra?q={{detalle.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
-				btnElim = "<a class=\"btn btn-danger\" href=\"javascript:void(0)\" onclick=\"eliminarDetalleCompra('{{detalle.id}}',{{detalle.orden}});\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
+				btnElim = "<a class=\"btn btn-danger\" href=\"javascript:void(0)\" onclick=\"eliminarDetalleCompra('{{detalle.id}}','{{detalle.orden}}');\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
 				tRow.innerHTML = "<td>{{detalle.item.codigo}}</td><td>{{detalle.item}}</td><td>{{detalle.cantidad}}</td><td>{{detalle.valor_unitario}}</td>"+"<td width=\"50\">"+btnEdit+btnElim+"</td>";
 				detalles.appendChild(tRow);		    
 			{% endfor %}
@@ -88,7 +88,7 @@
 	}
 	
 	function mostrarMensaje(string, orden){
-		alert(string);
+		//alert(string);
 		document.location.href = "/detallesCompra?orden="+orden;
 	}
 

@@ -5,6 +5,7 @@ from django.template import RequestContext
 from moduloInventario.models import Item, Proveedor, Categoria, Orden_Compra, Detalle_Orden_Compra
 from django.shortcuts import render_to_response, render, redirect
 from django import forms
+from django.http import HttpResponse
 
 # Create your views here.
 
@@ -257,8 +258,10 @@ def new_order_detail(p_id_orden,p_id_item,pi_cantidad,pf_valor):
         detail.item = get_item(p_id_item)
         detail.orden = Orden_Compra.objects.get(id=p_id_orden)
         detail.orden.valor_total = unicode(float(detail.orden.valor_total) + (float(pf_valor))*(int(pi_cantidad)))
+        detail.item.cantidad = unicode(int(pi_cantidad)+int(detail.item.cantidad))
         detail.save()
         detail.orden.save()
+        detail.item.save()
         return "Operacion Exitosa. El item ha sido ingresado en la orden de compra."
 
 def update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
@@ -273,9 +276,12 @@ def update_order_detail(detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
     detail.orden = Orden_Compra.objects.get(id=p_id_orden)
     detail.item = get_item(p_id_item)
     detail.cantidad = pi_cantidad
-    detail.valor = pf_valor
+    detail.valor_unitario = pf_valor
     detail.orden.valor_total = unicode(float(detail.orden.valor_total) - total_en_item_old + total_en_item_new)
+    detail.item.cantidad = unicode(int(detail.item.cantidad) - int(detail.cantidad) + int(pi_cantidad))
     detail.save()
+    detail.orden.save()
+    detail.item.save()
     return "Operacion Exitosa. Los datos del detalle de la orden #%s han sido actualizados"%p_id_orden
 
 def edit_order_detail(p_id_detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
@@ -296,7 +302,13 @@ def edit_order_detail(p_id_detail,p_id_orden,p_id_item,pi_cantidad,pf_valor):
 def delete_order_detail(p_id_detail):
     try:
         detail = Detalle_Orden_Compra.objects.get(id=p_id_detail)
+        orden = detail.orden
+        orden.valor_total = unicode(float(detail.orden.valor_total) - (float(detail.valor_unitario))*(int(detail.cantidad)))
+        item = detail.item
+        item.cantidad = unicode(int(item.cantidad)-int(detail.cantidad))
         detail.delete()
+        orden.save()
+        item.save()
         return "Operacion Exitosa. El detalle de compra ha sido eliminado"
     except:
         return "Operacion Fallida. El detalle que desea eliminar no se encuentra en la base de datos."
@@ -315,24 +327,19 @@ def nuevo_proveedor(request):
         return redirect('/login/?next=%s' % request.path)
     else:
     """
-    if 'action' in request.POST:
-        if request.POST['action'] == 'none':
-            form = ProveedorForm()
-            return render_to_response('InventarioFrontEnd/proveedor.html', {'form': form,'editing': False},context_instance=RequestContext(request))
-        elif request.POST['action'] == 'provider':
-            form = ProveedorForm(request.POST)
-            if form.is_valid():
-                mensaje = new_provider(request.POST['nombre'], request.POST['razon_social'], request.POST['ruc'], request.POST['telefono'])
-                if mensaje.startswith("Operacion Exitosa."):
-                    return render_to_response('InventarioFrontEnd/proveedores.html',{'lista': Proveedor.objects.all(),'mensaje':mensaje})
-                else:
-                    return render_to_response('InventarioFrontEnd/proveedor.html', {'form': form,'mensaje':mensaje},context_instance=RequestContext(request))
+    if request.method == 'POST':
+        form = ProveedorForm(request.POST)
+        if form.is_valid():
+            mensaje = new_provider(request.POST['nombre'], request.POST['razon_social'], request.POST['ruc'], request.POST['telefono'])
+            if mensaje.startswith("Operacion Exitosa."):
+                return render_to_response('InventarioFrontEnd/proveedores.html',{'lista': Proveedor.objects.all(),'mensaje':mensaje})
             else:
-                return render_to_response('InventarioFrontEnd/proveedor.html', {'form': form,'mensaje':form.errors},context_instance=RequestContext(request))
+                return render_to_response('InventarioFrontEnd/proveedor.html', {'form': form,'mensaje':mensaje},context_instance=RequestContext(request))
         else:
-            return redirect('/index/')
+            return render_to_response('InventarioFrontEnd/proveedor.html', {'form': form,'mensaje':form.errors},context_instance=RequestContext(request))
     else:
-        return redirect('/index/')
+        form = ProveedorForm()
+        return render_to_response('InventarioFrontEnd/proveedor.html', {'form': form,'editing': False},context_instance=RequestContext(request))
 
 def editar_proveedor(request):
     """
@@ -340,22 +347,18 @@ def editar_proveedor(request):
         return redirect('/login/?next=%s' % request.path)
     else:
     """
-    if not 'action' in request.POST: 
-        return redirect('/index/')
-    else: 
-        if request.POST['action'] == 'none':
-            form = ProveedorForm(instance=Item.objects.get(pk=request.POST['id']))
-            form.id = request.POST['id']
-            if form.is_valid():
-                form.save()
-                return render(request, 'InventarioFrontEnd/proveedor.html', {'form': form,'editing': True})
-        elif request.POST['action'] == 'provider':
+    i = Proveedor.objects.get(pk=(request.GET['q']))
+    if request.method != 'POST':
+        form = ProveedorForm(instance=i)
+        form.id = request.GET['q']
+        if form.is_valid():
+            form.save()
+        return render(request, 'InventarioFrontEnd/proveedor.html', {'form': form,'editing': True})
+    else:
+        if request.method == 'POST':
             form = ProveedorForm(request.POST)
             mensaje = edit_provider(request.POST['id'],request.POST['nombre'], request.POST['razon_social'], request.POST['ruc'], request.POST['telefono'])
-            return render_to_response('InventarioFrontEnd/proveedores.html',{'lista': Proveedor.objects.all(),'mensaje':mensaje})
-        else:
-            return redirect('/index/')
-        
+            return render_to_response('InventarioFrontEnd/proveedores.html',{'lista': Proveedor.objects.all(),'mensaje':mensaje})        
 
 def categorias(request):
     """
@@ -391,7 +394,7 @@ def editar_categoria(request):
         return redirect('/login/?next=%s' % request.path)
     else:
     """      
-    i = Item.objects.get(pk=(request.GET['q']))
+    i = Categoria.objects.get(pk=(request.GET['q']))
     if request.method != 'POST':
         form = CategoriaForm(instance=i)
         form.id = request.GET['q']
@@ -401,7 +404,7 @@ def editar_categoria(request):
         if request.method == 'POST':
             form = CategoriaForm(request.POST)
             mensaje = edit_category(request.POST['id'],request.POST['nombre'], request.POST['descripcion'])
-            return render_to_response('InventarioFrontEnd/categorias.html',{'lista': Proveedor.objects.all(),'mensaje':mensaje})
+            return render_to_response('InventarioFrontEnd/categorias.html',{'lista': Categoria.objects.all(),'mensaje':mensaje})
     return render(request, 'InventarioFrontEnd/categoria.html', {'form': form,'editing': True})
 
 def inventario(request):
@@ -511,7 +514,7 @@ def detalles_compra(request):
     else:
     """
     if 'orden' in request.GET:
-        return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=request.GET['orden']),'orden':request.GET['orden']})
+        return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=request.REQUEST['orden']),'orden':request.REQUEST['orden']})
     else:
         return redirect('/index/')
 
@@ -526,7 +529,7 @@ def nuevo_detalle_compra(request):
         if form.is_valid():
             mensaje = new_order_detail(request.POST['orden'],request.POST['item'], request.POST['cantidad'], request.POST['valor_unitario'])
             if mensaje.startswith("Operacion Exitosa."):
-                return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=request.POST['orden']),'orden':request.POST['orden'],'mensaje':mensaje})
+                return detalles_compra(request)
             else:
                 return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'mensaje':mensaje},context_instance=RequestContext(request))
         else:
@@ -534,7 +537,7 @@ def nuevo_detalle_compra(request):
     else:
         form = DetalleOrdenCompraForm()
         form.initial={'orden': request.GET['orden']}
-        return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'editing': False},context_instance=RequestContext(request))
+        return render_to_response('InventarioFrontEnd/compra_item.html', {'form': form,'editing': False,'orden': request.GET['orden']},context_instance=RequestContext(request))
 
 def editar_detalle_compra(request):
     """
@@ -546,9 +549,9 @@ def editar_detalle_compra(request):
     if request.method != 'POST':
         form = DetalleOrdenCompraForm(instance=i)
         form.id = request.GET['q']
-        print form.errors
         if form.is_valid():
             form.save()
+        return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'orden':request.GET['q']})
     else:
         if request.method == 'POST':
             form = DetalleOrdenCompraForm(request.POST)
@@ -556,8 +559,7 @@ def editar_detalle_compra(request):
             if mensaje.startswith("Operacion Exitosa."):
                 return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=request.POST['orden'])})
             else:
-                return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'mensaje': mensaje,'orden_id':request.POST['orden']},context_instance=RequestContext(request))
-    return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True})
+                return render(request, 'InventarioFrontEnd/compra_item.html', {'form': form,'editing': True,'mensaje': mensaje,'orden':request.POST['orden']},context_instance=RequestContext(request))
 
 def eliminar_detalle_compra(request):
     """
@@ -566,9 +568,12 @@ def eliminar_detalle_compra(request):
     else:
     """ 
     try:
-        return delete_order_detail(request.GET['q'])
+        id_orden = Detalle_Orden_Compra.objects.get(id=request.GET['q']).orden.id
+        mensaje = delete_order_detail(request.GET['q'])
+        return render_to_response('InventarioFrontEnd/detalles_compra.html',{'lista': Detalle_Orden_Compra.objects.filter(orden=id_orden),'mensaje':mensaje})
     except:
-        "Operacion Fallida. El item que desea eliminar no se encuentra en dicha orden de compra."
+        return HttpResponse()
+        #"Operacion Fallida. El item que desea eliminar no se encuentra en dicha orden de compra."
 
 class ItemForm(forms.ModelForm):   
     codigo = forms.CharField(required=True,max_length=30)

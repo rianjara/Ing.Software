@@ -15,7 +15,7 @@ class Proveedor(models.Model):
         return '%s'% (self.razon_social)
 
     class Meta:
-        db_table = 'OS_INVENTARIO_PROVEEDORES'
+        db_table = 'Proveedor'
         ordering = ['razon_social']
     
 class Categoria(models.Model):
@@ -29,7 +29,7 @@ class Categoria(models.Model):
         return 'CATEGORIA\nNombre: %s\nDescripcion: %s'% (self.nombre,self.descripcion)
     
     class Meta:
-        db_table = 'OS_INVENTARIO_CATEGORIAS'
+        db_table = 'Categoria'
         ordering = ['nombre']
 
 class Item(models.Model):
@@ -44,7 +44,7 @@ class Item(models.Model):
         return '%s'% (self.nombre)
     
     class Meta:
-        db_table = 'OS_INVENTARIO_ITEMS'
+        db_table = 'Item'
         ordering = ['codigo']
     
 class Orden_Compra(models.Model):
@@ -57,7 +57,7 @@ class Orden_Compra(models.Model):
         return '%d'% (self.id)
     
     class Meta:
-        db_table = 'OS_INVENTARIO_COMPRAS'
+        db_table = 'Compras'
         ordering = ['fecha']
     
 class Detalle_Orden_Compra(models.Model):
@@ -70,6 +70,6 @@ class Detalle_Orden_Compra(models.Model):
         return '%d - %s'%(self.orden.id,self.item)
     
     class Meta:
-        db_table = 'OS_INVENTARIO_DETALLES_COMPRAS'
+        db_table = 'Detalles_Compras'
         ordering = ['orden']
     
