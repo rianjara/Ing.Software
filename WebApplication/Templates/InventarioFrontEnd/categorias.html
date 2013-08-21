@@ -49,31 +49,19 @@
 	<script type="text/javascript">
 	{% if None != mensaje %}mostrarMensaje("{{mensaje}}");{% endif %}
 	var ajaxRequest;  // The variable that makes Ajax possible!
-	function loadOrdenCompra(){
-		detalles = document.getElementById("detail");
+	function loadItems(){
+		items = document.getElementById("items");
 		var lenght = 100;
 
-		if(detalles){
-			{% for detalle in lista %}
+		if(items){
+			{% for categoria in lista %}
 				tRow = document.createElement('tr');
-				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarOrdenCompra?q={{detalle.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
-				btnDetalle = "<a class=\"btn btn-primary\" href=\"\/detallesCompra?orden={{detalle.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Detalle</a>";
-				tRow.innerHTML = "<td>{{detalle.id}}</td><td>{{detalle.fecha}}</td><td>{{detalle.proveedor}}</td><td>{{detalle.factura}}</td><td>{{detalle.valor_total}}</td>"+"<td width=\"50\">"+btnEdit+btnDetalle+"</td>";
-				detalles.appendChild(tRow);
+				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarCategoria?q={{categoria.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
+				tRow.innerHTML = "<td>{{categoria.nombre}}</td><td>{{categoria.descripcion}}</td>"+"<td width=\"50\">"+btnEdit+"</td>";
+				items.appendChild(tRow);
 				lenght++;			    
 			{% endfor %}
 		}
-	}
-	
-	function eliminarItem(id){
-		ajaxFunction();
-		ajaxRequest.onreadystatechange = function(){
-		   if(ajaxRequest.readyState == 4){
-		   	  mostrarMensaje(ajaxRequest.responseText);
-		   }
-		}
-		ajaxRequest.open("GET", "/eliminarDetalleCompra?q=" + id, false);
- 		ajaxRequest.send(null);
 	}
 	
 	function ajaxFunction(){
@@ -92,11 +80,10 @@
 	
 	function mostrarMensaje(string){
 		alert(string);
-		document.location.href = "/ordenesCompra/";
 	}
 
 	</script>
-<body onload="loadOrdenCompra();">
+<body onload="loadItems();">
 	<div class="container article" id="wrap">
 		<div class="search-bar" style="width: auto; text-align: right;">
 		<a class="btn btn-primary" href="../index/" style="float: left;"><span class="fui-arrow-left"></span>Inicio</a>
@@ -106,18 +93,22 @@
 		</form>
 		</div>
 		<br>
-        <a class="btn btn-primary btn-nuevo" href="../nuevaOrdenCompra/"><span class="fui-plus"></span> Nueva Orden Compra</a>
+        <a class="btn btn-primary btn-nuevo" href="../nuevaCategoria/"><span class="fui-plus"></span> Nueva Categoria</a>
         <br>
 		<div class="conatiner">
 			<table>
 				<thead>
 					<tr>
-						<th>No. Orden Compra</th><th>Fecha</th><th>Proveedor</th><th>No. Factura</th><th>Total</th>
+						<th>Nombre</th><th>Descripcion</th>
 					</tr>
 				</thead>
-				<tbody id="detail">
+				<tbody id="items">
 				</tbody>
+				
 			</table>
 		</div>
+
+
 	</div>
+
 </body>
