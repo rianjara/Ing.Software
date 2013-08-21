@@ -1,0 +1,39 @@
+{% extends "base.html"%}
+
+{%block title%} {%if editing %}Editar{%else%}Nuevo{%endif%} Item{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../inventario/" style="float: left;"><span class="fui-arrow-left"></span>Inventario</a>
+
+<h1>{%if editing %}Editar{%else%}Nuevo{%endif%} Item</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Parece que olvido ingresar alguna informacion, por favor intentelo de nuevo.
+        </p>
+    {% endif %}
+	{% if None != mensaje %}
+    	<p id="mensaje" style="color: red;">{{ mensaje }}</p>
+    {% endif %}
+    <form action="" method="post">{% csrf_token %}
+    	<input type="hidden" name="id" value="{{form.id}}"/>
+    	<div class="field">
+            {{ form.codigo.errors }}<label for="codigo">Codigo:</label>{{ form.codigo }}
+        </div>
+        <div class="field">
+            {{ form.nombre.errors }}<label for="nombre">Nombre:</label>{{ form.nombre }}
+        </div>        
+        <div class="field">
+            {{ form.descripcion.errors }}<label for="descripcion">Descripcion:</label>{{ form.descripcion }}
+        </div>
+        <div class="field">
+            {{ form.categoria.errors }}<label for="categoria">Categoria:</label>{{ form.categoria }}
+        </div>
+        <div class="field">
+            {{ form.valor_venta.errors }}<label for="valor_venta">Valor Venta:</label>{{ form.valor_venta }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Guardar item" >
+    </form>
+   </div>
+{% endblock%}

@@ -1,0 +1,42 @@
+{% extends "base.html"%}
+
+{%block title%} Nuevo Abono{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../abonos/" style="float: left;"><span class="fui-arrow-left"></span>Abonos</a>
+
+<h1>Nuevo Abono</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Parece que olvido ingresar alguna informacion, por favor intentelo de nuevo.
+        </p>
+    {% endif %}
+
+    <form action="" method="post">{% csrf_token %}
+    
+    	<div class="field">
+            {{ form.fecha.errors }}
+            <label for="id_fecha">Fecha:</label>
+            {{ form.fecha }}
+        </div>
+        <div class="field">
+            {{ form.orden_pedido.errors }}
+            <label for="id_orden_pedido">Orden de pedido:</label>
+            {{ form.orden_pedido }}
+        </div>        
+        <div class="field">
+            {{ form.monto.errors }}
+            <label for="id_monto">Monto:</label>
+            {{ form.monto }}
+        </div>
+        <div class="field">
+            {{ form.tipo_pago.errors }}
+            <label for="id_tipo_pago">Tipo de pago:</label>
+            {{ form.tipo_pago }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Guardar nuevo abono" >
+    </form>
+   </div>
+{% endblock%}

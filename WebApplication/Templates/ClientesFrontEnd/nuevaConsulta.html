@@ -1,0 +1,92 @@
+{% extends "base.html"%}
+
+{%block title%} Nuevo Cliente{% endblock%}
+{% block jscript%}
+<script src="../static/js/validar-cedula-ruc.js">
+</script>
+{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../consultas/" style="float: left;"><span class="fui-arrow-left"></span>Consultas</a>
+
+<h1>Nueva Consulta</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Please correct the error{{ form.errors|pluralize }} below.
+        </p>
+    {% endif %}
+
+    <form action="" method="post">{% csrf_token %}
+    
+    	<div class="field">
+            {{ form.cliente.errors }}
+            <label for="id_esfera">Cliente:</label>
+            {{ form.cliente }}
+        </div>
+    	<div class="field">
+            {{ form.esfera.errors }}
+            <label for="id_esfera">Esfera:</label>
+            {{ form.esfera }}
+        </div>
+        <div class="field">
+            {{ form.cilindro.errors }}
+            <label for="id_c">cilindro:</label>
+            {{ form.cilindro }}
+        </div>        
+        <div class="field">
+            {{ form.eje.errors }}
+            <label for="id_eje">eje:</label>
+            {{ form.eje }}
+        </div>
+        <div class="field">
+            {{ form.av.errors }}
+            <label for="id_av">AV:</label>
+            {{ form.av }}
+        </div>
+         <div class="field">
+            {{ form.add.errors }}
+            <label for="id_add">ADD:</label>
+            {{ form.add }}
+        </div>
+          <div class="field">
+            {{ form.dp.errors }}
+            <label for="id_dp">DP:</label>
+            {{ form.dp }}
+        </div>
+        <div class="field">
+            {{ form.fecha.errors }}
+            <label for="id_fecha">Fecha:</label>
+            {{ form.fecha }}
+        </div>
+        <div class="field">
+            {{ form.Diagnostico.errors }}
+            <label for="id_Diagnostico">Diagnostico:</label>
+            {{ form.Diagnostico }}
+        </div>
+        <div class="field">
+            {{ form.Observaciones.errors }}
+            <label for="id_Observaciones">Observaciones:</label>
+            {{ form.Observaciones }}
+        </div>        
+        <div class="field">
+            {{ form.vista.errors }}
+            <label for="id_vista">Vista:</label>
+            {{ form.vista }}
+        </div>   
+        <div class="field">
+            {{ form.ojo.errors }}
+            <label for="id_ojo">Ojo:</label>
+            {{ form.ojo }}
+        </div>      
+        <div class="field">
+            {{ form.estado.errors }}
+            <label for="id_estado">Estado:</label>
+            {{ form.estado }}
+        </div>         
+   
+        <input type="submit" class="btn btn-primary" value="Guardar Consulta" onclick="validarDocumento(cedula);">
+    </form>
+   </div>
+{% endblock%}
