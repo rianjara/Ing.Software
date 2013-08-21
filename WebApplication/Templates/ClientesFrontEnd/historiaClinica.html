@@ -1,0 +1,116 @@
+<!DOCTYPE>
+<html>
+<head>
+	<title>Sistema &Oacute;ptica - Historia Clinica</title>
+	<!-- Loading Bootstrap -->
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="../static/css/flat-ui.css" rel="stylesheet"></head>
+	<style>
+	body{
+		text-align:center; 
+		margin: auto; 
+		background-color:rgb(225,225,225);
+	}
+	table{
+		width: 100%;
+		border: solid 2px;
+		border-color: #34495e;
+	}
+	thead{
+		display:table-header-group;
+		background-color: #34495e;
+		color: #ffffff;
+	}
+	tbody{
+		font-size: 100%;
+		text-align: center;
+	}
+	td{
+		border: solid 1px gray;
+	}
+
+	.article{
+		-webkit-box-shadow: rgba(0,0,0,.7) 5px 5px 15px;
+		-moz-box-shadow: 5px 5px 10px rgba(0,0,0,.7);
+		box-shadow: 5px 5px 10px rgba(0,0,0,.7);
+		width:800px;
+		padding-top:50px; 
+		background-color:white; 
+		padding: 20px;
+	}
+	.btn-nuevo{
+		width: 97%;
+		margin: 0 10px 5px 0;
+	}
+	</style>
+
+	<script type="text/javascript">
+	function loadItems(){
+		items = document.getElementById("items");
+		var lenght = 0;
+
+		if(items){
+			{% for consulta in l_consultas %}
+				tRow = document.createElement('tr');
+				btnEdit = "<a class=\"btn {% ifequal consulta.estado "PENDIENTE" %} btn-primary btn-success {% endifequal %}{% ifequal consulta.estado "REALIZADA" %} btn-disabled {% endifequal %}\" href=\"\/marcarConsultaYaRealizada\/?q={{consulta.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-check\"></span><br>Marcar</a>";
+				//btnElim = "<a class=\"btn btn-danger\" href=\"\/eliminarCliente\/?q={{consulta.id}}\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
+				//tRow.innerHTML = "<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
+				tRow.innerHTML = "<td>{{consulta.vista}}</td><td>{{consulta.ojo}}</td><td>{{consulta.esfera}}</td><td>{{consulta.cilindro}}</td><td>{{consulta.eje}}</td><td>{{consulta.av}}</td><td>{{consulta.add}}</td><td>{{consulta.dp}}</td><td>{{consulta.fecha}}</td><td>{{consulta.Diagnostico}}</td><td>{{consulta.estado}}</td><td width=\"50\">"+btnEdit+"</td>";
+				items.appendChild(tRow);
+				lenght++;			    
+			{% endfor %}
+
+			document.getElementById('wrap').style('width',lenght*100);
+		}
+	}
+	</script>
+
+<body onload="loadItems();">
+	<div class="container article" id="wrap">
+		<div class="search-bar" style="width: auto; text-align: right;">
+		{% if error %}
+		    <p style="color: red;">No existen clientes con ese criterio</p>
+		{% endif %}
+
+		<form action="" method="post">
+			{% csrf_token %}
+			<a class="btn btn-primary" href="../buscarHistoriaClinica/" style="float: left;"><span class="fui-arrow-left"></span>Buscar Historia Clinica<span class="fui-search"></span></a>
+	          <!--<input type="text" name="query" value="{{ query }}" placeholder="Buscar" class="span3" />-->
+	        <!--<a class="btn btn-primary" href="/busquedaClientes/"><span class="fui-search"></span>Buscar</a>-->
+	    </form>
+
+	    <!--{% block buscar%}{% endblock%}
+	    <form action="" method="post">
+			{% csrf_token %}    
+		    	<div class="field">
+		            {{ form.query.errors }}
+		            <label for="id_query">Buscar:</label>
+		            {{ form.query }}
+		        </div>
+		        <input type="submit" class="btn btn-primary" value="Buscar">
+		</form>-->
+		<br>
+        <!--<a class="btn btn-primary btn-nuevo" href="../nuevaConsulta/"><span class="fui-plus"></span> Nueva Consulta</a>-->
+        <br>
+        <h2>Historia Clinica: {{ l_consultas.0.cliente.nombre}} {{ l_consultas.0.cliente.apellido1}}</h2>
+        
+        <br>
+		<div class="container">
+			<table>
+				<thead>
+					<tr>
+						<th>Vista</th><th>Ojo</th><th>Esfera</th><th>Cilindro</th><th>Eje</th><th>AV</th><th>ADD</th><th>DP</th><th>Fecha</th><th>Diagnostico</th><th>Estado</th>
+					</tr>
+				</thead>
+				<tbody id="items">
+				</tbody>
+
+			</table>
+		</div>
+
+
+	</div>
+
+</body>

@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+	<title>Sistema &Oacute;ptica - Estado de P&eacuterdidas y Gan&aacutencias</title>
+	<!-- Loading Bootstrap -->
+    <link href="../static/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Loading Flat UI -->
+    <link href="../static/css/flat-ui.css" rel="stylesheet"></head>
+	<style>
+	body{
+		text-align:center; 
+		margin: auto; 
+		background-color:rgb(225,225,225);
+	}
+	table{
+		width: 100%;
+		border: 0;
+		border-spacing:90px 20px;
+	}
+	thead{
+		display:table-header-group;
+		background-color: #34495e;
+		color: #ffffff;
+	}
+	tbody{
+		font-size: 100%;
+		text-align: center;
+	}
+	td{
+		border: solid 1px gray;
+	}
+
+	.article{
+		-webkit-box-shadow: rgba(0,0,0,.7) 5px 5px 15px;
+		-moz-box-shadow: 5px 5px 10px rgba(0,0,0,.7);
+		box-shadow: 5px 5px 10px rgba(0,0,0,.7);
+		width:800px;
+		padding-top:50px; 
+		background-color:white; 
+		padding: 20px;
+	}
+	.btn-nuevo{
+		width: 97%;
+		margin: 0 10px 5px 0;
+	}
+	
+	#pop-up {
+			font-size: 33px;
+			text-align:center;
+            display: none;
+            width: auto;
+            height:auto;
+            position:absolute;
+            top:45%;
+            left:40%;
+            margin:-50px 0 0 -100px;
+            background-color: rgb(251,251,251);
+            border-radius: 10px;
+            border: solid gray 5px;
+            padding: 10px;
+     }
+	</style>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
+</script>
+<script>
+var suma = 0;
+$('#sum_ingresos tr.dato').each(function(){ 
+ suma += parseInt($(this).find('td').eq(1).text()||0,10) //numero de la celda 2
+ $table.find('input[name="total"]').val(suma);
+})
+
+</script>
+<script>
+var suma = 0;
+$('#sum_egresos tr.dato').each(function(){ 
+ suma += parseInt($(this).find('td').eq(1).text()||0,10) //numero de la celda 2
+ $table.find('input[name="total"]').val(suma);
+})
+
+</script>
+	<script type="text/javascript">
+        function mostrarPopup(id) {
+                document.cookie = "popupillo=false";
+                document.getElementById("pop-up").style.display = "block";
+            
+            document.getElementById("btn-eliminar").setAttribute("href","/eliminarGasto/?q="+id);
+        }
+
+        function ocultarPopup() {
+            document.getElementById("pop-up").style.display = "none";
+        }
+        
+   	
+	function loadIngresos(){
+		t_ingresos = document.getElementById("ingresos");
+		var lenght = 0;
+
+		if(t_ingresos){
+			{% for ingresos in  list_ingresos %}
+				tRow = document.createElement('tr');
+			
+				//tRow.innerHTML = "<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
+				tRow.innerHTML = "<td>{{ingresos.items.nombre}}</td><td>{{ingresos.items.precio_venta_unitario}}*{{ingresos.items.cantidad}}</td>;
+				items.appendChild(tRow);
+				lenght++;			    
+			{% endfor %}
+
+			document.getElementById('wrap').style('width',lenght*100);
+		}
+	}
+	function loadEgresos(){
+		t_egresos = document.getElementById("egresos");
+		var lenght = 0;
+
+		if(t_egresos){
+			{% for egresos in  list_egresos %}
+				tRow = document.createElement('tr');
+			
+				//tRow.innerHTML = "<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
+				tRow.innerHTML = "<td>{{egresos.item.nombre}}</td><td>{{egresos.valor_total}}</td>;
+				items.appendChild(tRow);
+				lenght++;			    
+			{% endfor %}
+
+			document.getElementById('wrap').style('width',lenght*100);
+		}
+	}
+
+	
+	funcion restar(){
+	var subtotal1 =document.getElementById("ingresos_total");
+	var subtotal2 =document.getElementById("egresos_total");
+	total=subtotal1-subtotal2
+	document.getElementById('rentabilidad').value = Total;
+	}
+	</script>
+	
+<body onload="loadItems();">
+	<div id="page" class="container article" id="wrap">
+		<div class="search-bar" style="width: auto; text-align: right;">
+		{% if error %}
+		    <p style="color: red;">No existen ordenes de compra con ese criterio</p>
+		{% endif %}
+		
+		<form action="" method="post">
+			{% csrf_token %}
+			<a class="btn btn-primary" href="../index/" style="float: left;"><span class="fui-arrow-left"></span>Inicio</a>
+	          <!--<input type="text" name="query" value="{{ query }}" placeholder="Buscar" class="span3" />-->
+	        <a class="btn btn-primary" href="/busquedaClientes/"><span class="fui-search"></span>Buscar</a>
+	    </form>
+	    
+	    <!--{% block buscar%}{% endblock%}
+	    <form action="" method="post">
+			{% csrf_token %}    
+		    	<div class="field">
+		            {{ form.query.errors }}
+		            <label for="id_query">Buscar:</label>
+		            {{ form.query }}
+		        </div>
+		        <input type="submit" class="btn btn-primary" value="Buscar">
+		</form>-->
+		<br>
+        <a class="btn btn-primary btn-nuevo" href="../nuevoGasto/"><span class="fui-plus"></span> Estado de P&eacuterdidas y Gan&aacutencias</a>
+        <br>
+		<div class="conatiner">
+			<table id="sum_ingresos">
+				<thead>
+					<tr>
+						<th>Ingresos</th><th></th><th>Valor</th>
+					</tr>
+				</thead>
+				<tbody id="ingresos">
+				<tr>
+                     <td>Total de Ingresos</td>
+                     <td><input type="text" id="ingresos_total" value="" name="total" /></td>
+                </tr>
+				</tbody>
+			
+				
+			</table>
+		
+		<div class="conatiner">
+			<table id="sum_egresos">
+				<thead>
+					<tr>
+						<th>Egresos</th><th></th><th>Valor</th>
+					</tr>
+				</thead>
+				<tbody id="egresos">
+				<tr>
+                     <td>Total de Egresos</td>
+                     <td><input type="text" id="egresos_total" value="" name="total" /></td>
+                </tr>
+				</tbody>
+			
+				
+			</table>
+		</div>
+	
+		<div class="conatiner">
+			<table>
+				<thead>
+					<tr>
+						<th>Rentabilidad Neta</th><th></th><th id="rentabilidad"></th>
+					</tr>
+				</thead>
+				<tbody>
+				   
+				</tbody>
+				
+			</table>
+		</div>
+	
+
+		<div id="pop-up">
+			Desea Eliminar este Gasto
+			<hr/>
+            <div style="background-color:white;">
+			    <a class="btn btn-large btn-success" id="btn-eliminar" href="#">Si</a>
+			    <a class="btn btn-large btn-primary" href="#" onclick="ocultarPopup();">No</a>
+		    </div>
+        </div>
+</body>
+</html>

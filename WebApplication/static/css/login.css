@@ -1,0 +1,115 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto:100);
+@import url(http://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.css);
+
+body {
+    background: #ECF0F1;
+    color: white;
+    font-family: 'Roboto';
+}
+.flat-form {
+    background: #48C9AF;
+    margin: 25px auto;
+    width: 390px;
+    position: relative;
+    font-family: 'Roboto';
+    padding-bottom: 20px;
+}
+.tabs {
+    background-color: #c0392b;
+    width: 390px;
+    display: block;
+    
+    text-align: center;
+}
+.form-action {
+    padding: 0 20px;
+    position: relative;
+}
+.tabs h1 {
+    font-size: 42px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-weight: bold;
+}
+.form-action p {
+    font-weight: bolder;
+	font-size: 17px;
+	padding-top: 12px;
+	padding-bottom: 12px;
+	line-height: 25px;
+	text-align: justify;
+}
+form {
+    padding-right: 20px !important;
+}
+form input[type=text],
+form input[type=password],
+form input[type=submit] {
+    font-family: 'Roboto';
+}
+form input[type=text],
+form input[type=password] {
+	font-size: medium;
+    width: 100%;
+    height: 40px;
+    margin-bottom: 10px;
+    padding-left: 15px;
+    background: #fff;
+    border: none;
+    color: #7F8C8D;
+    outline: none;
+}
+.dark-box {
+    background: #5e0400;
+    box-shadow: 1px 3px 3px #3d0100 inset;
+    height: 40px;
+    width: 50px;
+}
+.form-action .dark-box.bottom {
+    position: absolute;
+    right: 0;
+    bottom: -24px;
+}
+.show {
+    display: block;
+}
+.hide {
+    display: none;
+}
+.button {
+    border: none;
+    display: block;
+    background: #136899;
+    height: 40px;
+    width: 80px;
+    color: #ffffff;
+    text-align: center;
+    border-radius: 5px;
+    /*box-shadow: 0px 3px 1px #2075aa;*/
+    -webkit-transition: all 0.15s linear;
+    -moz-transition: all 0.15s linear;
+    transition: all 0.15s linear;
+}
+.button:hover {
+    background: #1e75aa;
+    /*box-shadow: 0 3px 1px #237bb2;*/
+}
+
+.button:active {
+    background: #136899;
+    /*box-shadow: 0 3px 1px #0f608c;*/
+}
+::-webkit-input-placeholder {
+    color: #7F8C8D;
+}
+:-moz-placeholder {
+    /* Firefox 18- */
+    color: #7F8C8D;
+}
+::-moz-placeholder {
+    /* Firefox 19+ */
+    color: #7F8C8D;
+}
+:-ms-input-placeholder {
+    color: #7F8C8D;
+}

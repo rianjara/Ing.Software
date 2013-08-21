@@ -1,0 +1,36 @@
+{% extends "base.html"%}
+
+{%block title%} {%if editing %}Editar{%else%}Nuevo{%endif%} Detalle de Compra{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../ordenesCompra/" style="float: left;"><span class="fui-arrow-left"></span>Ordenes de Compra</a>
+
+<h1>{%if editing %}Editar{%else%}Nuevo{%endif%} Detalle de Compra</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Parece que olvido ingresar alguna informacion, por favor intentelo de nuevo.
+        </p>
+    {% endif %}
+	{% if None != mensaje %}
+    	<p id="mensaje" style="color: red;">{{ mensaje }}</p>
+    {% endif %}
+    <form action="" method="post">{% csrf_token %}
+    	<input type="hidden" name="id" value="{{form.id}}"/>
+    	<div class="field" style="display:none">
+            {{ form.orden.errors }}<label for="item">Orden:</label>{{ form.orden }}
+        </div>
+    	<div class="field">
+            {{ form.item.errors }}<label for="item">Item:</label>{{ form.item }}
+        </div>
+        <div class="field">
+            {{ form.cantidad.errors }}<label for="factura">Cantidad</label>{{ form.cantidad }}
+        </div>        
+        <div class="field">
+            {{ form.valor_unitario.errors }}<label for="valor_unitario">Valor Unitario</label>{{ form.valor_unitario }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Guardar" >
+    </form>
+   </div>
+{% endblock%}
