@@ -229,10 +229,11 @@ class ItemCantidadForm(forms.ModelForm):
         self.fields['item'].widget = widgets.TextInput(attrs={'class': 'autocomplete-me'})
 
 class OrdenPedidoForm(forms.ModelForm):
-    codigo = forms.CharField(max_length=10)    
+    codigo = forms.CharField(max_length=10)  
+    codigo_factura = forms.CharField(max_length=10)  
     detalle = forms.CharField( required = False,widget=forms.Textarea(attrs={'cols':'100','rows':'4'}) )
     fecha_compra=forms.DateField(widget=SelectDateWidget(years=range(datetime.today().year-4, datetime.today().year+1 ),attrs={'style':'width: 100px;'}))
-    fecha_facturacion=forms.DateField(widget=SelectDateWidget(years=range(datetime.today().year-4, datetime.today().year+1 ),attrs={'style':'width: 100px;'}),required=False)
+    fecha_facturacion=forms.DateField(widget=SelectDateWidget(years=range(datetime.today().year-4, datetime.today().year+1 ),attrs={'style':'width: 100px;'}),required=True)
     sub_total=forms.DecimalField(max_digits=8, decimal_places=4)
     iva=forms.DecimalField(max_digits=8, decimal_places=4)
     total=forms.DecimalField(max_digits=8, decimal_places=4)

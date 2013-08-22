@@ -85,7 +85,7 @@
 				
 				//<!--href=\"\/eliminarcuenta\/?q={{cuentas_x_pagar.id}}\"-->
 				//tRow.innerHTML = "<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
-				tRow.innerHTML = "<td>{{cuentas_x_pagar.Detalle_Orden_Compra.orden.proveedor.nombre}}</td><td>{{cuentas_x_pagar.Detalle_Orden_Compra.item.nombre}}</td><td>{{$cuentas_x_pagar.Detalle_Orden_Compra.orden.valor_total}}</td><td>{{cuentas_x_pagar.Detalle_Orden_Compra.orden.fecha}}</td><td>{{cuentas_x_pagar.Detalle_Orden_Compra.orden.fecha}}</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
+				tRow.innerHTML = "<td>{{cuentas_x_pagar.Detalle_Orden_Compra.orden.proveedor.nombre}}</td><td>{{cuentas_x_pagar.Detalle_Orden_Compra.item.nombre}}</td><td>${{cuentas_x_pagar.Detalle_Orden_Compra.orden.valor_total}}</td><td>{{cuentas_x_pagar.Detalle_Orden_Compra.orden.fecha}}</td><td>{{cuentas_x_pagar.Detalle_Orden_Compra.orden.fecha}}</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
 				items.appendChild(tRow);
 				lenght++;			    
 			{% endfor %}
@@ -104,7 +104,7 @@
 		
 		<form action="" method="post" style="padding-bottom:30;">
 			{% csrf_token %}
-			<a class="btn btn-primary" href="../index/" style="float: left;"><span class="fui-arrow-left"></span>Inicio</a>
+			<a class="btn btn-primary" href="../index/#contabilidad" style="float: left;"><span class="fui-arrow-left"></span>Inicio</a>
 	          <!--<input type="text" name="query" value="{{ query }}" placeholder="Buscar" class="span3" />
 	        <a class="btn btn-primary" href="/busquedaClientes/"><span class="fui-search"></span>Buscar</a>-->
 	    </form>
