@@ -41,7 +41,7 @@ class Item(models.Model):
     categoria = models.ForeignKey(Categoria)
     
     def __str__(self):
-        return '%s'% (self.nombre)
+        return '%s %s'% (self.codigo, self.nombre)
     
     class Meta:
         db_table = 'Item'

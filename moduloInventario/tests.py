@@ -6,8 +6,8 @@ Replace this with more appropriate tests for your application.
 """
 
 from django.test import TestCase
-from moduloInventario.views import *
-from moduloInventario.models import Item
+from moduloInventario.models import Item, Categoria, Proveedor
+from moduloInventario.views import create_item
 
 
 class CrearItem(TestCase):
@@ -157,8 +157,3 @@ class CrearItem(TestCase):
 class EliminarItem(TestCase):
     def setUp(self):
         Item.objects.create(codigo='ln_002',nombre='Lentes Bifocales 001',descripcion=None,cantidad=10,costo_unitario=47.50,circulando=True,categoria=Categoria.objects.get(nombre='Lentes'),proveedor=Proveedor.objects.get(nombre='Proveedor1'))
-        
-    def test_item_cp007(self):
-        delete_item(1)
-        item=get_item(1)
-        self.assertEqual(item.circulando, False)

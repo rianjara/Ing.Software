@@ -1,0 +1,37 @@
+{% extends "base.html"%}
+
+{%block title%} {%if editing %}Editar{%else%}Nuevo{%endif%} Proveedor{% endblock%}
+
+{% block content%}
+<div class="container article" id="wrap">
+<a class="btn btn-primary" href="../proveedores/" style="float: left;"><span class="fui-arrow-left"></span>Proveedores</a>
+
+<h1>{%if editing %}Editar{%else%}Nuevo{%endif%} Proveedor</h1>
+
+    {% if form.errors %}
+        <p style="color: red;">
+            Parece que olvido ingresar alguna informacion, por favor intentelo de nuevo.
+        </p>
+    {% endif %}
+	{% if None != mensaje %}
+    	<p id="mensaje" style="color: red;">{{ mensaje }}</p>
+    {% endif %}
+    <form action="" method="post">{% csrf_token %}
+    	<input type="hidden" name="id" value="{{form.id}}"/>
+    	<input type="hidden" name="action" value="provider"/>
+    	<div class="field">
+            {{ form.nombre.errors }}<label for="nombre">Nombre:</label>{{ form.nombre }}
+        </div>
+        <div class="field">
+            {{ form.razon_social.errors }}<label for="razon_social">Razon Social:</label>{{ form.razon_social }}
+        </div>        
+        <div class="field">
+            {{ form.ruc.errors }}<label for="ruc">RUC:</label>{{ form.ruc }}
+        </div>
+        <div class="field">
+            {{ form.telefono.errors }}<label for="telefono">Telefono:</label>{{ form.telefono }}
+        </div>
+        <input type="submit" class="btn btn-primary" value="Guardar Proveedor" >
+    </form>
+   </div>
+{% endblock%}

@@ -57,7 +57,7 @@
 				btnEdit = "<a class=\"btn btn-primary\" href=\"#fakelink\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
 				btnElim = "<a class=\"btn btn-danger\" href=\"#fakelink\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
 				//tRow.innerHTML = "<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
-				tRow.innerHTML = "<td>{{item.fecha}}</td><td>{{item.orden_pedido}}</td><td>{{item.monto}}</td><td>{{item.tipo_pago}}</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
+				tRow.innerHTML = "<td>{{abono.fecha}}</td><td>{{abono.orden_pedido}}</td><td>{{abono.monto}}</td><td>{{abono.tipo_pago}}</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
 				items.appendChild(tRow);
 				lenght++;			    
 			{% endfor %}

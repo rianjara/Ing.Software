@@ -6,18 +6,18 @@ from django.forms.extras.widgets import SelectDateWidget
 from moduloInventario.models import Item
 from django.core.exceptions import ValidationError
 from django.utils.datastructures import MultiValueDictKeyError
-from django.contrib.auth.decorators import login_required
 from datetime import datetime, date
 from django.forms.models import inlineformset_factory
 from django.forms import models, widgets
 from django.forms.widgets import TextInput
 from moduloClientes.models import Cliente
 from django.http.response import Http404
+import decimal
 
 
 def ventas(request):
     list_ventas = OrdenPedido.objects.exclude(codigo_factura__isnull=True)
-    return render_to_response('FacturacionFrontEnd/ventas.html',{'l_ventas': list_ventas})
+    return render_to_response('FacturacionFrontEnd/ordenesPedido.html',{'l_ordenes': list_ventas})
 
 def ordenes_pedido(request):
     list_ordenes = OrdenPedido.objects.all()
@@ -52,12 +52,16 @@ def nueva_orden_pedido(request):
     return render(request, 'FacturacionFrontEnd/formOrdenDePedido.html', {'orden_form': orden_form, 'formset':formset})
 
 def save_item_cantidad(codigo,item,cantidad,precio_unitario):
-    item1=Item_OrdenPedido_Cantidad(orden_pedido=OrdenPedido.objects.filter(pk=codigo)[0],
-                    item=Item.objects.filter(pk=item)[0],
+    #update_item
+    item1 = Item.objects.filter(codigo=item)[0]
+    item1.cantidad = int(item1.cantidad)- int(cantidad)
+    item1.save()
+    item_orden1=Item_OrdenPedido_Cantidad(orden_pedido=OrdenPedido.objects.filter(pk=codigo)[0],
+                    item=item1,
                     cantidad=cantidad,
                     precio_venta_unitario=precio_unitario,
                     porcentaje_descuento=0.0)                    
-    item1.save(force_insert=True)
+    item_orden1.save(force_insert=True)
     
 def save_items_x_cantidad_in_orden(request):
     Item_OrdenPedido_Cantidad.objects.filter(orden_pedido=request.POST['codigo']).delete()
@@ -69,6 +73,14 @@ def save_items_x_cantidad_in_orden(request):
               request.POST['%s-item'%prefix],
               request.POST['%s-cantidad'%prefix],
               request.POST['%s-precio_venta_unitario'%prefix])
+
+def get_valor_total_orden_pedido(orden_id):
+    item_orden1 = Item_OrdenPedido_Cantidad.objects.filter(orden_pedido=orden_id)
+    sum = 0
+    for i in item_orden1:
+        sum = sum + i.cantidad*i.precio_venta_unitario
+    return sum
+        
 
 def editar_orden_pedido(request):
     fset=models.BaseInlineFormSet
@@ -86,10 +98,15 @@ def editar_orden_pedido(request):
             orden_form = OrdenPedidoForm(instance=orden_p0)
             #formset = OrdenFormSet(initial=items_0)#'''queryset=items_0'''
             items_formset = []
+            sum = 0
             for item_i in items_0:
-                items_formset.append({'cantidad': item_i.cantidad , 'item': item_i.item, 'precio_venta_unitario':item_i.precio_venta_unitario,'subtotal':item_i.cantidad*item_i.precio_venta_unitario})
+                items_formset.append({'cantidad': item_i.cantidad , 'item': item_i.item.codigo, 'precio_venta_unitario':item_i.precio_venta_unitario,'subtotal':item_i.cantidad*item_i.precio_venta_unitario})
+                sum = sum + item_i.cantidad*item_i.precio_venta_unitario
             
             formset = OrdenFormSet(initial=items_formset)
+            orden_form.sub_total = sum
+            orden_form.iva = sum*decimal.Decimal(0.12)
+            orden_form.total = sum*decimal.Decimal(1.12)
         else:
             raise Http404
     elif request.method == 'POST':
@@ -120,11 +137,13 @@ def nuevo_abono(request):
         form = AbonoForm(request.POST)
         if form.is_valid():
             try:
-                a = Abono(fecha=request.POST['fecha'],orden_pedido=request.POST['orden_pedido'],tipo_pago=request.POST['tipo_pago'],monto=request.POST['monto'])
+                op = OrdenPedido.objects.filter(pk=request.POST['orden_pedido'])[0]
+                a = Abono(fecha=date(year=int(request.POST['fecha_year']),month=int(request.POST['fecha_month']),day=int(request.POST['fecha_day'])),orden_pedido=op,tipo_pago=request.POST['tipo_pago'],monto=request.POST['monto'])
             
                 #a = Abono(fecha=request.POST['fecha'],orden_pedido=request.POST['orden_pedido'],tipo_pago=request.POST['tipo_pago'],monto=request.POST['monto'])
             except MultiValueDictKeyError:
-                a = Abono(fecha=request.POST['fecha'],orden_pedido=request.POST['orden_pedido'],tipo_pago=request.POST['tipo_pago'],monto=request.POST['monto'])
+                op = OrdenPedido.objects.filter(pk=request.POST['orden_pedido'])[0]
+                a = Abono(fecha=date(year=int(request.POST['fecha_year']),month=int(request.POST['fecha_month']),day=int(request.POST['fecha_day'])),orden_pedido=op,tipo_pago=request.POST['tipo_pago'],monto=request.POST['monto'])
             a.save()
             return abonos(request)
     else:
@@ -211,9 +230,12 @@ class ItemCantidadForm(forms.ModelForm):
 
 class OrdenPedidoForm(forms.ModelForm):
     codigo = forms.CharField(max_length=10)    
-    detalle = forms.CharField( widget=forms.Textarea(attrs={'cols':'100','rows':'4'}) )
+    detalle = forms.CharField( required = False,widget=forms.Textarea(attrs={'cols':'100','rows':'4'}) )
     fecha_compra=forms.DateField(widget=SelectDateWidget(years=range(datetime.today().year-4, datetime.today().year+1 ),attrs={'style':'width: 100px;'}))
     fecha_facturacion=forms.DateField(widget=SelectDateWidget(years=range(datetime.today().year-4, datetime.today().year+1 ),attrs={'style':'width: 100px;'}),required=False)
+    sub_total=forms.DecimalField(max_digits=8, decimal_places=4)
+    iva=forms.DecimalField(max_digits=8, decimal_places=4)
+    total=forms.DecimalField(max_digits=8, decimal_places=4)
     #items = forms.MultipleChoiceField()
     
     class Meta:

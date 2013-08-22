@@ -92,21 +92,28 @@ digitoVerificador = residuo==0 ? 0: modulo - residuo;
 if (pub==true){
 if (digitoVerificador != d9){
 alert('El ruc de la empresa del sector p&uacute;blico es incorrecto.');
+window.location.assign('http://127.0.0.1:8000/nuevoCliente/');
+document.getElementById('id_cedula').value = 'invalid'
 return false;
 }
 /* El ruc de las empresas del sector publico terminan con 0001*/
 if ( numero.substr(9,4) != '0001' ){
 alert('El ruc de la empresa del sector p&uacute;blico debe terminar con 0001');
+document.getElementById('id_cedula').value = 'invalid'
 return false;
 }
 }
 else if(pri == true){
 if (digitoVerificador != d10){
 alert('El ruc de la empresa del sector privado es incorrecto.');
+window.location.assign('http://127.0.0.1:8000/nuevoCliente/');
+document.getElementById('id_cedula').value = 'invalid'
 return false;
 }
 if ( numero.substr(10,3) != '001' ){
 alert('El ruc de la empresa del sector privado debe terminar con 001');
+window.location.assign('http://127.0.0.1:8000/nuevoCliente/');
+document.getElementById('id_cedula').value = 'invalid'
 return false;
 }
 }
@@ -114,10 +121,14 @@ return false;
 else if(nat == true){
 if (digitoVerificador != d10){
 alert('El número de cédula de la persona natural es incorrecto.');
+window.location.assign('http://127.0.0.1:8000/nuevoCliente/');
+document.getElementById('id_cedula').value = 'invalid'
 return false;
 }
 if (numero.length >10 && numero.substr(10,3) != '001' ){
 alert('El ruc de la persona natural debe terminar con 001');
+window.location.assign('http://127.0.0.1:8000/nuevoCliente/');
+document.getElementById('id_cedula').value = 'invalid'
 return false;
 }
 }

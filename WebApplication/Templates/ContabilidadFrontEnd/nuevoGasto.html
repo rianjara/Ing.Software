@@ -1,6 +1,6 @@
 {% extends "base.html"%}
 
-{%block title%} Nuevo Cliente{% endblock%}
+{%block title%} Registrar Gasto{% endblock%}
 {% block jscript%}
 <script src="../static/js/validar-cedula-ruc.js">
 </script>
@@ -8,9 +8,9 @@
 
 {% block content%}
 <div class="container article" id="wrap">
-<a class="btn btn-primary" href="../clientes/" style="float: left;"><span class="fui-arrow-left"></span>Clientes</a>
+<a class="btn btn-primary" href="../gastos/" style="float: left;"><span class="fui-arrow-left"></span>Gastos</a>
 
-<h1>Nuevo Cliente</h1>
+<h1>Registrar Gasto</h1>
 
     {% if form.errors %}
         <p style="color: red;">
@@ -21,24 +21,30 @@
     <form action="" method="post">{% csrf_token %}
     	<div class="field">
             {{ form.concepto.errors }}
-            <label for="id_cedula">Concepto:</label>
+            <label for="id_concepto">Concepto:</label>
             {{ form.concepto }}
         </div>
-  
+        
+        <div class="field">
+            {{ form.valor_gasto.errors }}
+            <label for="id_valor_gastoa">Monto:</label>
+            {{ form.valor_gasto }}
+        </div>
+        
         <div class="field">
             {{ form.fecha_gasto.errors }}
-            <label for="id_fecha_nacimiento">Fecha Gasto:</label>
+            <label for="id_fecha_gasto">Fecha Gasto:</label>
             {{ form.fecha_gasto }}
         </div>
         <div class="field">
             {{ form.beneficiario.errors }}
-            <label for="id_telefonos">Beneficiario:</label>
+            <label for="id_beneficiario">Beneficiario:</label>
             {{ form.beneficiario }}
         </div>        
          
         <div class="field">
             {{ form.factura.errors }}
-            <label for="id_ruc">Factura:</label>
+            <label for="id_factura">Factura:</label>
             {{ form.factura }}
         </div>
         <input type="submit" class="btn btn-primary" value="Guardar Gasto" onclick="validarDocumento(cedula);">

@@ -56,9 +56,9 @@
 		if(detalles){
 			{% for detalle in lista %}
 				tRow = document.createElement('tr');
-				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarOrdenCompra?q={{detalle.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
-				//btnElim = "<a class=\"btn btn-danger\" href=\"javascript:void(0)\" onclick=\"eliminarOrdenCompra('{{detalle.id}}');\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
-				tRow.innerHTML = "<td>{{detalle.id}}</td><td>{{detalle.fecha}}</td><td>{{detalle.proveedor}}</td><td>{{detalle.factura}}</td><td>{{detalle.valor_total}}</td>"+"<td width=\"50\">"+btnEdit+"</td>";
+				btnEdit = "<a class=\"btn btn-success\" href=\"\/editarOrdenCompra?q={{detalle.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
+				btnDetalle = "<a class=\"btn btn-info\" href=\"\/detallesCompra?orden={{detalle.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-list\"></span><br>Detalle</a>";
+				tRow.innerHTML = "<td>{{detalle.id}}</td><td>{{detalle.fecha}}</td><td>{{detalle.proveedor}}</td><td>{{detalle.factura}}</td><td>{{detalle.valor_total}}</td>"+"<td width=\"50\">"+btnEdit+btnDetalle+"</td>";
 				detalles.appendChild(tRow);
 				lenght++;			    
 			{% endfor %}

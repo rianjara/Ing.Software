@@ -9,25 +9,78 @@ from django.forms.extras.widgets import SelectDateWidget
 from django.http.response import Http404
 from django.contrib.auth.decorators import login_required
 from datetime import datetime, date
-from django.contrib.admin.templatetags.admin_list import register
 
 
 def clientes(request):
+    """
+    Muestra la lista de todos los clientes con sus respectivos datos
+    **Context**
+    ``l_clienete``
+        Lista de instancias de :model:`moduloClientes.CLiente` ordenados por nombre alfabeticamente
+    
+    ``user``
+        en caso de que se desee eliminar un cliente se requiere authenticacion del administrador
+    
+    **Tempalte:**
+    
+    :ClientesFrontEnd/clientes.html`
+    """
     list_clientes = Cliente.objects.all()
     usuario = request.user
     return render_to_response('ClientesFrontEnd/clientes.html',{'l_clienetes': list_clientes, 'user': usuario})
 
 def consultas(request):
+    """
+    Muestra la lista de todas las consultas medicas y su estado
+    
+    **Context**
+    ``l_consultas``
+        Lista de instancias de :model:`moduloClientes.Consultas` ordenados por fecha
+        
+    ``user``
+        en caso de que se desee eliminar un cliente se requiere authenticacion del administrador
+        
+    **Template:**
+    
+    :ClientesFrontEnd/consultas.html`
+    """
     list_consultas = Consultas.objects.all()
     usuario = request.user
     return render_to_response('ClientesFrontEnd/consultas.html',{'l_consultas': list_consultas, 'user': usuario})
 
 def buscar_historia_clinica(request):
+    """
+    Muestra la lista de todas los clientes en un ComboBox para seleccionar la historia clinica del cliente a consultar en
+    en especifico.
+    
+    **Context**
+    ``l_clientes``
+        Lista de instancias de :model:`moduloClientes.Cliente` que aparecen en el ComboBox
+        
+    **Template:**
+    
+    :ClientesFrontEnd/buscarHistoriaClinica.html`
+    """
     clients = Cliente.objects.all()
     return render(request, 'ClientesFrontEnd/buscarHistoriaClinica.html',{'l_clientes':clients})
 
 def historia_clinica(request):
+    """
+    Muestra la historia clinica de un cliente consultado en especifico si no existen consultas para el cliente consultado
+    regresa a la pantalla de busqueda
     
+    **Context**
+    ``l_clientes``
+        Lista de instancias de :model:`moduloClientes.Cliente` que aparecen en el ComboBox
+        
+    ``l_consultas``
+        Lista de las consultas medicas que conforman la historia clinica del cliente consultado
+        
+    **Template:**
+    
+    :ClientesFrontEnd/historiaClinica.html`
+    :ClientesFrontEnd/buscarHistoriaClinica.html`
+    """
     if 'q' in request.GET and request.GET['q']:
         #q = decode_id(request.GET['q'])
         q = request.GET['q']
@@ -42,12 +95,25 @@ def historia_clinica(request):
         raise Http404
         
 def nuevo_cliente(request):
+    """
+    Obtiene la informacion del formulario de nuevo cliente para instanciar un :model:`moduloClientes.Cliente` y guardarlo en la base
+    
+    **Context**
+    ``form``
+        Formulario con la informacion del nuevo cliente enviado mediante POST
+        
+    **Template:**
+    
+    :ClientesFrontEnd/nuevoCliente.html`
+    """
     if request.method == 'POST':
         form = ClienteForm(request.POST)
-        if form.is_valid():
+        if form.is_valid() and request.POST['cedula'] != 'invalid':
             try:
                 c = Cliente(cedula=request.POST['cedula'],nombre=request.POST['nombre'],apellido1=request.POST['apellido1'],apellido2=request.POST['apellido2'],fecha_nacimiento=date(year=int(request.POST['fecha_nacimiento_year']),month=int(request.POST['fecha_nacimiento_month']),day=int(request.POST['fecha_nacimiento_day'])),telefonos=request.POST['telefonos'],direccion=request.POST['direccion'],e_mail1=request.POST['e_mail1'],e_mail2=request.POST['e_mail2'],ruc=request.POST['ruc'])
             except MultiValueDictKeyError:
+                c = Cliente(cedula=request.POST['cedula'],nombre=request.POST['nombre'],apellido1=request.POST['apellido1'],apellido2=request.POST['apellido2'],telefonos=request.POST['telefonos'],direccion=request.POST['direccion'],e_mail1=request.POST['e_mail1'],e_mail2=request.POST['e_mail2'],ruc=request.POST['ruc'])
+            except ValueError:
                 c = Cliente(cedula=request.POST['cedula'],nombre=request.POST['nombre'],apellido1=request.POST['apellido1'],apellido2=request.POST['apellido2'],telefonos=request.POST['telefonos'],direccion=request.POST['direccion'],e_mail1=request.POST['e_mail1'],e_mail2=request.POST['e_mail2'],ruc=request.POST['ruc'])
             c.save()
             return clientes(request)
@@ -57,6 +123,21 @@ def nuevo_cliente(request):
     return render(request, 'ClientesFrontEnd/nuevoCliente.html', {'form': form})
 
 def nueva_consulta(request):
+    """
+    Ingresa una nueva consulta
+
+    **Context**
+
+    ``RequestContext``
+
+    ``Consultas``
+        Instancia de :model:`moduloContabilidad.Consultas`.
+        
+    **Template:**
+
+    :template:`ClientesFrontEnd/nuevaConsulta.html`
+
+    """
     if request.method == 'POST':
         form = ConsultaForm(request.POST)
         if form.is_valid():
@@ -73,9 +154,32 @@ def nueva_consulta(request):
     return render(request, 'ClientesFrontEnd/nuevaConsulta.html', {'form': form})
 
 def buscar_form(request):
+    """
+    Muestra el formulario de busqueda
+    
+    **Template:**
+
+    :template:`ClientesFrontEnd/buscar.html`
+    """
     return render(request, 'ClientesFrontEnd/buscar.html')
 
 def buscar_cliente(request):
+    """
+    Muestra los clientes como resultado de la busqueda
+
+    **Context**
+
+    ``l_clienetes``
+        lista de clientes resultado de la busqueda
+
+    ``error``
+        Se muestra un mensaje en caso de que no se haya podido encontrar coincidencias con la busqueda`.
+        
+    **Template:**
+
+    :template:`ClientesFrontEnd/clientes.html`
+
+    """
     if 'q' in request.GET and request.GET['q']:
         q = request.GET['q']        
         clientes = Cliente.objects.filter(Q(nombre__icontains=q) | Q(apellido1__icontains=q) | Q(apellido2__icontains=q))
@@ -89,6 +193,17 @@ def buscar_cliente(request):
         return render(request, 'ClientesFrontEnd/clientes.html', {'l_clienetes': list_clientes})
     
 def editar_cliente(request):
+    """
+    Obtiene la informacion del formulario de un cliente para editarlo en una instancia :model:`moduloClientes.Cliente` y guardarlo en la base
+    
+    **Context**
+    ``form``
+        Formulario con la informacion del cliente enviado a editar
+        
+    **Template:**
+    
+    :ClientesFrontEnd/nuevoCliente.html`
+    """
     try:     
         c = Cliente.objects.get(pk=int(request.GET['q']))
     except Exception:
@@ -136,6 +251,21 @@ def marcar_consulta(request):
     return consultas(request)
 
 def editar_consulta(request):
+    """
+    Edita una consulta
+
+    **Context**
+
+    ``RequestContext``
+
+    ``Consultas``
+        Instancia de :model:`moduloContabilidad.Consultas`.
+        
+    **Template:**
+
+    :template:`ClientesFrontEnd/nuevaConsulta.html`
+
+    """
     try:     
         cons = Consultas.objects.get(pk=int(request.GET['q']))
     except Exception:
@@ -161,6 +291,10 @@ def editar_consulta(request):
 
 @login_required
 def eliminar_cliente(request):
+    """
+    Elimina un cliente en especifico en caso que no se pueda accesar al cliente se levanta la pagina de ``Recurso No Encontrado``
+    Usa :view:`moduloClientes.clientes`
+    """
     try:   
         c = Cliente.objects.get(pk=int(request.GET['q']))
     except Exception:
@@ -173,7 +307,18 @@ def eliminar_cliente(request):
     return clientes(request)
 
 @login_required
-def eliminar_consulta(request):  
+def eliminar_consulta(request):
+    """
+    Elimina una consulta
+
+    **Context**
+
+    ``RequestContext``
+
+    ``Consultas``
+        Instancia de :model:`moduloContabilidad.Consultas`.
+        
+    """   
     try:       
         c = Consultas.objects.get(pk=int(request.GET['q']))
     except Exception:
@@ -185,21 +330,35 @@ def eliminar_consulta(request):
     return consultas(request)
 
 def create_nuevo_cliente(cedula,nombre,apellido1,apellido2,fecha_nacimiento,telefonos,direccion,e_mail1,e_mail2,ruc):
+    """Crea una nueva instancia de :model:`moduloClientes.Cliente`"""
     cliente = Cliente(cedula=cedula,nombre=nombre,apellido1=apellido1,apellido2=apellido2,fecha_nacimiento=fecha_nacimiento,telefonos=telefonos,direccion=direccion,e_mail1=e_mail1,e_mail2=e_mail2,ruc=ruc)
     cliente.save()
 
 def create_nueva_consulta(cliente,esfera,cilindro,eje,av,add,dp,fecha,Diagnostico,Observaciones,vista,ojo,estado):
+    """
+    Crear una nueva consulta
+
+    **Context**
+
+    ``RequestContext``
+
+    ``Consultas``
+        Instancia de :model:`moduloContabilidad.Consultas`.
+        
+    """
     consulta = Consultas(cliente,esfera,cilindro,eje,av,add,dp,fecha,Diagnostico,Observaciones,vista,ojo,estado)
     consulta.save()
 
 class ClienteForm(forms.ModelForm):
+    """
+    Construye el formulario para el :template:`ClientesFrontEnd/nuevoCliente.html` validando los campos
+    """
     id = forms.IntegerField(required=False)
     cedula = forms.RegexField(max_length=10,required=False, regex=r'^[0-9]+')
     nombre = forms.CharField(max_length=30)
     apellido1 = forms.CharField(max_length=30,required=False)
     apellido2 = forms.CharField(max_length=30,required=False)
     fecha_nacimiento = forms.DateField(widget=SelectDateWidget(years=range(datetime.today().year-99, datetime.today().year+1 )),required=False)
-    #maximo cuatro telefonos separados por coma
     telefonos = forms.RegexField(max_length=10, regex=r'^[0-9]+')
     direccion = forms.CharField(max_length=100)
     e_mail1 = forms.EmailField(required=False)
@@ -214,20 +373,36 @@ def validate_cilindro(value):
         raise ValidationError('%s debe ser un numero negativo'% value)
     
 def validate_eje(value):
+    """
+        Valida que el eje no pueda ser mayor a 180 ni negativo
+        
+    """ 
     if value >180:
         raise ValidationError('%s es un numero mayor a 180 grados'% value)
     if value <0:
         raise ValidationError('%s no puede ser un numero negativo'% value)    
 
 def validate_add(value):
+    """
+        Valida que el add no pueda ser negativo
+        
+    """ 
     if value <0:
         raise ValidationError('%s no puede ser un numero negativo'% value)
 
 def validate_dp(value):
+    """
+        Valida que el dp no pueda ser negativo
+        
+    """ 
     if value <0:
         raise ValidationError('%s no puede ser un numero negativo'% value)
 
 class ConsultaForm(forms.ModelForm):
+    """
+        Crea un nuevo formulario de Cliente
+        
+    """ 
     id = forms.IntegerField(required=False)
     VISTA_CHOICES = (
                      ('LEJOS', 'LEJOS'),
@@ -265,16 +440,12 @@ class ConsultaForm(forms.ModelForm):
     eje=forms.IntegerField(validators=[validate_eje])
     av=forms.ChoiceField(choices=AV_CHOICES)
     
-    add=forms.DecimalField(max_digits=5,decimal_places=3)
-    
-        
+    add=forms.DecimalField(max_digits=5,decimal_places=3)      
     dp=forms.DecimalField(max_digits=5,decimal_places=3)
     
     fecha=forms.DateField(widget=SelectDateWidget(),required=False)
     Diagnostico = forms.CharField(widget=forms.Textarea(attrs={'cols':'100','rows':'4'}),required=False)
-    Observaciones = forms.CharField(widget=forms.Textarea(attrs={'cols':'100','rows':'4'}),required=False)
-   
-   
+    Observaciones = forms.CharField(widget=forms.Textarea(attrs={'cols':'100','rows':'4'}),required=False)   
 
     class Meta:
         model = Consultas 

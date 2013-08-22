@@ -1,13 +1,16 @@
 from django.db import models
 
 class Cliente(models.Model):
+    """
+    Almacena un cliente con sus respectivos nombre, appellidos, numero de cedula, fecha nacimiento
+    telefonos, direccion y correos electronicos
+    """
     
     cedula = models.CharField(max_length=10,null=True)
     nombre = models.CharField(max_length=30)
     apellido1 = models.CharField(max_length=30,null=True)
     apellido2 = models.CharField(max_length=30,null=True)
     fecha_nacimiento = models.DateField(null=True)
-    #maximo cuatro telefonos separados por coma
     telefonos = models.CharField(max_length=43)
     direccion = models.CharField(max_length=100)
     e_mail1 = models.EmailField(null=True)
@@ -15,19 +18,24 @@ class Cliente(models.Model):
     ruc = models.CharField(max_length=15)
     
     def __str__(self):
+        """Presenta el objeto cliente como un string monstrando los campos de cedula, nombre y apellido"""
         return '%s %s %s' %(self.cedula,self.nombre, self.apellido1)
     
     def get_fields(self):
+        """Retorna una lista de tuplas con los nombres de campos de la tabla clientes y el valor"""
         return  [(field.name, field.value) for field in Cliente._meta.fields]
             
     class Meta:
+        """Nombra la tabla Cliente en la base y destermina que se debe ordenar por el nombre por defecto"""
         db_table = 'Cliente'
         ordering =["nombre"]
                 
     class Admin():
+        """Otorga acceso del administrador a la tabla"""
         pass
    
 class Consultas(models.Model):
+    """Almacena consultas usando el :model:`moduloClientes.CLiente` """
     EYE_CHOICES = (('IZQUIERDO', 'Ojo Izquierdo'),('DERECHO', 'Ojo Derecho'),)
     VISION_CHOICES = (('CERCA', 'Vision de Cerca'),('LEJOS', 'Vision de Lejos'),)
     ESTADO_CHOICES=(('PENDIENTE', 'Consulta Pendiente'),('REALIZADA', 'Consulta Realizada'),('Proceso', 'Consulta en Proceso'),)

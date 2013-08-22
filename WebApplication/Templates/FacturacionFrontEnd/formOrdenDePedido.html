@@ -9,13 +9,24 @@
 		var table = document.getElementById(tableId);
 		var tableLen = table.rows.length;
 		var row = null;
+		var sum = 0;
 		
 		for (var n = 0; n < tableLen; n++){
 			row = table.rows[n];
 			if(row.getElementsByTagName("input").length != 0)
 				row.getElementsByTagName("input")[3].value=row.getElementsByTagName("input")[0].value*row.getElementsByTagName("input")[2].value;
+			}
+		
+		for (var n = 0; n < tableLen; n++){
+			row = table.rows[n];
+			if(row.getElementsByTagName("input").length != 0)
+				sum = sum + row.getElementsByTagName("input")[0].value*row.getElementsByTagName("input")[2].value;
 		}
+		document.getElementById("id_sub_total").value = sum;
+		document.getElementById("id_iva").value = parseFloat(sum*0.12).toFixed(2);
+		document.getElementById("id_total").value = parseFloat(sum*1.12).toFixed(2);
 	}
+	
 	function loopSelected()
 	{
 		var selectedArray = new Array();
@@ -28,7 +39,7 @@
 		
 		for (i=0; i<selObj.options.length; i++) {
 			if (selObj.options[i].selected) {
-				selectedArray[count] = selObj.options[i].value;	
+				selectedArray[count] = selObj.options[i].text;	
 				count++;
 			}
 		}
@@ -37,7 +48,7 @@
 			row = table.rows[n];
 			if((n-1) < selectedArray.length){
 				row.getElementsByTagName("input")[0].value = 0;
-				row.getElementsByTagName("input")[1].value = selectedArray[n-1];
+				row.getElementsByTagName("input")[1].value = selectedArray[n-1].split(" ")[0];
 				row.getElementsByTagName("input")[2].value = "0.00";
 			}else{
 				row.getElementsByTagName("input")[0].value = '';
@@ -49,7 +60,7 @@
 	}
 </script>
 {% endblock%}
-
+{% block onload%} onload="auto_calculate_formula('formset')"{% endblock%}
 {% block content%}
 <div class="container article" id="wrap">
 <a class="btn btn-primary" href="../ordenesDePedido/" style="float: left;"><span class="fui-arrow-left"></span>Ordenes de Pedido</a>
@@ -63,7 +74,7 @@
     {% endif %}
 
     <form action="" method="post">{% csrf_token %}
-    	<div class="field">
+    	<div class="field" style="width:400; float:left;">
             {{ orden_form.codigo.errors }}
             <label for="id_codigo">C&oacute;digo:</label>
             {{ orden_form.codigo }}
@@ -73,7 +84,7 @@
             <label for="id_codigo_factura">Factura Asociada:</label>
             {{ orden_form.codigo_factura }}
         </div>     
-        <div class="field">
+        <div class="field" style="width:400; float:left;">
             {{ orden_form.fecha_compra.errors }}
             <label for="id_fecha_compra">Fecha de Compra:</label>
             {{ orden_form.fecha_compra }}
@@ -100,7 +111,7 @@
         
         {{ formset.management_form}}
         {{ formset.non_form_errors.as_ul }}
-        <div>
+        <div style="padding-left:60px;">
 			<table id="formset" class="form" onkeyup="auto_calculate_formula('formset')">
 			{% for form in formset.forms %}
 			  {% if forloop.first %}
@@ -125,10 +136,27 @@
 		</div>
 		{# tabla items #}
 		
-        <div style="width:100%">
+        <div style="width:400; float:left;">
             {{ orden_form.detalle.errors }}
             <label for="id_detalle">Detalle:</label>
             {{ orden_form.detalle }}
+        </div>
+        <div style="width:400; float:left;" onkeyup="auto_calculate_formula('formset')">
+        	<div>
+	            {{ orden_form.sub_total.errors }}
+	            <label for="id_detalle">Subtotal:</label>
+	            {{ orden_form.sub_total }}
+	        </div>
+	        <div>
+	            {{ orden_form.iva.errors }}
+	            <label for="id_detalle">12% IVA:</label>
+	            {{ orden_form.iva }}
+	        </div>
+	        <div>
+	            {{ orden_form.total.errors }}
+	            <label for="id_detalle">Total:</label>
+	            {{ orden_form.total }}
+	        </div>
         </div>
         <input type="submit" class="btn btn-primary" value="Guardar Orden de Pedido" >
     </form>

@@ -48,44 +48,58 @@
 	</style>
 	<script type="text/javascript">
 	{% if None != mensaje %}mostrarMensaje("{{mensaje}}");{% endif %}
-	
+	var ajaxRequest;  // The variable that makes Ajax possible!
 	function loadItems(){
 		items = document.getElementById("items");
+		var lenght = 100;
 
 		if(items){
-			{% for item in lista_items %}
+			{% for categoria in lista %}
 				tRow = document.createElement('tr');
-				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarItem?q={{item.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
-				//btnElim = "<a class=\"btn btn-danger\" href=\"javascript:void(0)\" onclick=\"eliminarItem('{{item.id}}');\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
-				tRow.innerHTML = "<td>{{item.codigo}}</td><td>{{item.nombre}}</td><td>{{item.descripcion}}</td><td>{{item.categoria}}</td><td>{{item.valor_venta}}</td><td>{{item.cantidad}}</td>"+"<td width=\"50\">"+btnEdit+"</td>";
-				items.appendChild(tRow);		    
+				btnEdit = "<a class=\"btn btn-primary\" href=\"\/editarCategoria?q={{categoria.id}}\" style=\"font-size: 10px; width:100%; height: 40px; padding:0;\"><span class=\"fui-new\"></span><br>Editar</a>";
+				tRow.innerHTML = "<td>{{categoria.nombre}}</td><td>{{categoria.descripcion}}</td>"+"<td width=\"50\">"+btnEdit+"</td>";
+				items.appendChild(tRow);
+				lenght++;			    
 			{% endfor %}
 		}
 	}
 	
+	function ajaxFunction(){
+	 try{
+	   // Opera 8.0+, Firefox, Safari
+	   ajaxRequest = new XMLHttpRequest();
+	 }catch (e){
+	   // Internet Explorer Browsers
+	   try{
+	      ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+	   }catch (e) {
+	      ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+	   }
+	 }
+	}
+	
 	function mostrarMensaje(string){
 		alert(string);
-		document.location.href = "/inventario/";
 	}
 
 	</script>
 <body onload="loadItems();">
 	<div class="container article" id="wrap">
-		<div class="search-bar" style="width: auto; text-align: right; margin-bottom:30px;">
+		<div class="search-bar" style="width: auto; text-align: right;">
 		<a class="btn btn-primary" href="../index/" style="float: left;"><span class="fui-arrow-left"></span>Inicio</a>
-		<!--<form action="" method="get">
+		<form action="" method="get">
 	          <input name="string_search" type="text" value="{{string_busqueda}}" placeholder="Buscar" class="span3" />
 	          <input class="btn btn-primary" type="submit" value="Buscar">
-		</form>-->
+		</form>
 		</div>
 		<br>
-        <a class="btn btn-primary btn-nuevo" href="../nuevoItem/"><span class="fui-plus"></span> Nuevo Item</a>
+        <a class="btn btn-primary btn-nuevo" href="../nuevaCategoria/"><span class="fui-plus"></span> Nueva Categoria</a>
         <br>
 		<div class="conatiner">
 			<table>
 				<thead>
 					<tr>
-						<th>Codigo</th><th>Item</th><th>Descripcion</th><th>Categoria</th><th>Valor Venta</th><th>Cantidad Disponible</th>
+						<th>Nombre</th><th>Descripcion</th>
 					</tr>
 				</thead>
 				<tbody id="items">

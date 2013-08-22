@@ -2,8 +2,6 @@ from django.db import models
 from moduloClientes.models import Cliente
 from moduloInventario.models import Item
 
-# Create your models here.
-
 TIPO_PAGO_CHOICES = (('EFECTIVO', 'Efectivo'),
                  ('CHEQUE', (('PCF','Banco Pacifico'),
                           ('PCH','Banco de Pichincha'),

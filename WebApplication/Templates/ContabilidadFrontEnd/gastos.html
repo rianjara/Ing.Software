@@ -85,7 +85,7 @@
 				btnElim = "<a class=\"btn btn-danger\" href=\"#\" onclick=\"mostrarPopup({{gastos.id}})\" style=\"font-size: 10px; height: 40px; padding:0;\"><span class=\"fui-cross\"></span>Eliminar</a>";
 				//<!--href=\"\/eliminarGastos\/?q={{gastos.id}}\"-->
 				//tRow.innerHTML = "<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
-				tRow.innerHTML = "<td>{{gastos.concepto}}</td><td>{{gastos.valor_gasto}}</td><td>{{gastos.fecha_gasto}}</td><td>{{gastos.beneficiario}}</td><td>{{gastos.factura}}</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
+				tRow.innerHTML = "<td>{{gastos.concepto}}</td><td>${{gastos.valor_gasto}}</td><td>{{gastos.fecha_gasto}}</td><td>{{gastos.beneficiario}}</td><td>{{gastos.factura}}</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
 				items.appendChild(tRow);
 				lenght++;			    
 			{% endfor %}
@@ -96,17 +96,31 @@
 	</script>
 	
 <body onload="loadItems();">
+	<a style="display: block;
+						text-decoration: none;
+						width: 70px;
+						height: 20px;
+						background-color: khaki;
+						float: right;
+						border-radius: 10px;
+						border: 2px solid;
+						margin-right: 10px;" href="
+			{% if user.is_authenticated %}
+			    /logout">Logout</a>
+		    {% else %}
+		    	/login">Login</a>
+		    {% endif %}
 	<div id="page" class="container article" id="wrap">
 		<div class="search-bar" style="width: auto; text-align: right;">
 		{% if error %}
 		    <p style="color: red;">No existen clientes con ese criterio</p>
 		{% endif %}
 		
-		<form action="" method="post">
+		<form action="" method="post" style="padding-bottom:30;">
 			{% csrf_token %}
 			<a class="btn btn-primary" href="../index/" style="float: left;"><span class="fui-arrow-left"></span>Inicio</a>
-	          <!--<input type="text" name="query" value="{{ query }}" placeholder="Buscar" class="span3" />-->
-	        <a class="btn btn-primary" href="/busquedaClientes/"><span class="fui-search"></span>Buscar</a>
+	          <!--<input type="text" name="query" value="{{ query }}" placeholder="Buscar" class="span3" />
+	        <a class="btn btn-primary" href="/busquedaClientes/"><span class="fui-search"></span>Buscar</a>-->
 	    </form>
 	    
 	    <!--{% block buscar%}{% endblock%}
