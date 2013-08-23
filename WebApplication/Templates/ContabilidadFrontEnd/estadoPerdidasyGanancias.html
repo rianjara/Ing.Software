@@ -1,11 +1,12 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
+<head>
 	<title>Sistema &Oacute;ptica - Estado de P&eacuterdidas y Gan&aacutencias</title>
 	<!-- Loading Bootstrap -->
     <link href="../static/css/bootstrap.css" rel="stylesheet">
 
     <!-- Loading Flat UI -->
-    <link href="../static/css/flat-ui.css" rel="stylesheet"></head>
+    <link href="../static/css/flat-ui.css" rel="stylesheet">
 	<style>
 	body{
 		text-align:center; 
@@ -61,114 +62,86 @@
      }
 	</style>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js">
-</script>
-<script>
-var suma = 0;
-$('#sum_ingresos tr.dato').each(function(){ 
- suma += parseInt($(this).find('td').eq(1).text()||0,10) //numero de la celda 2
- $table.find('input[name="total"]').val(suma);
-})
-
-</script>
-<script>
-var suma = 0;
-$('#sum_egresos tr.dato').each(function(){ 
- suma += parseInt($(this).find('td').eq(1).text()||0,10) //numero de la celda 2
- $table.find('input[name="total"]').val(suma);
-})
-
-</script>
-	<script type="text/javascript">
-        function mostrarPopup(id) {
-                document.cookie = "popupillo=false";
-                document.getElementById("pop-up").style.display = "block";
-            
-            document.getElementById("btn-eliminar").setAttribute("href","/eliminarGasto/?q="+id);
-        }
-
-        function ocultarPopup() {
-            document.getElementById("pop-up").style.display = "none";
-        }
-        
-   	
-	function loadIngresos(){
-		t_ingresos = document.getElementById("ingresos");
-		var lenght = 0;
-
-		if(t_ingresos){
-			{% for ingresos in  list_ingresos %}
-				tRow = document.createElement('tr');
-			
-				//tRow.innerHTML = "<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
-				tRow.innerHTML = "<td>{{ingresos.items.nombre}}</td><td>{{ingresos.items.precio_venta_unitario}}*{{ingresos.items.cantidad}}</td>;
-				items.appendChild(tRow);
-				lenght++;			    
-			{% endfor %}
-
-			document.getElementById('wrap').style('width',lenght*100);
-		}
-	}
-	function loadEgresos(){
-		t_egresos = document.getElementById("egresos");
-		var lenght = 0;
-
-		if(t_egresos){
-			{% for egresos in  list_egresos %}
-				tRow = document.createElement('tr');
-			
-				//tRow.innerHTML = "<td>A"+((i/10>=1)?"0"+i:"00"+i)+"TB</td><td>Item"+i+"</td><td>Detalle"+i+"</td><td>$"+i+",00</td><td>"+i+"</td><td width=\"50\">"+btnEdit+btnElim+"</td>";
-				tRow.innerHTML = "<td>{{egresos.item.nombre}}</td><td>{{egresos.valor_total}}</td>;
-				items.appendChild(tRow);
-				lenght++;			    
-			{% endfor %}
-
-			document.getElementById('wrap').style('width',lenght*100);
-		}
-	}
-
+	</script>
+	<script>
+		//calcula el total de egresos
+		function loadEgresos(){
+			t_egresos = document.getElementById("items1");
+			var lenght = 0;
 	
-	funcion restar(){
-	var subtotal1 =document.getElementById("ingresos_total");
-	var subtotal2 =document.getElementById("egresos_total");
-	total=subtotal1-subtotal2
-	document.getElementById('rentabilidad').value = Total;
-	}
+			if(t_egresos){
+			
+				
+				sum = 0;
+				{% for egreso in  l_egresos %}
+					tRow = document.createElement('tr');
+					val_egreso={{egreso.valor_total}};
+					tRow.innerHTML = "<td>factura: {{egreso.factura}}</td><td>$"+val_egreso+"</td>";
+					t_egresos.appendChild(tRow);
+					lenght++;
+					sum = (sum + val_egreso);  
+				{% endfor %}
+				document.getElementById('egresos_total').value = "$"+sum;
+			}
+		}
+		
+		//calcula el total de ingresos
+		function loadIngresos(){
+			t_ingresos = document.getElementById("items0");
+			var lenght = 0;
+			
+			if(t_ingresos){
+				var sum = 0;
+				tRow = document.createElement('tr');
+				
+				{% for ingreso in  l_ingresos %}
+					tRow = document.createElement('tr');
+					var valor_total_unitario = {{ingreso.precio_venta_unitario}}*{{ingreso.cantidad}};
+					tRow.innerHTML = "<td>{{ingreso.item.nombre}}</td><td>$"+valor_total_unitario+"</td>";
+					t_ingresos.appendChild(tRow);
+					lenght++;
+					sum = (sum + valor_total_unitario); 		    
+				{% endfor %}
+					document.getElementById('ingresos_total').value = "$"+sum;
+			}
+		}
+		
+		//calcula la utilidad neta
+		function restar(){
+			var total_ingresos =document.getElementById("ingresos_total").value.split('$')[1];
+			var total_egresos =document.getElementById("egresos_total").value.split('$')[1];
+			total = total_ingresos-total_egresos
+			document.getElementById('rentabilida_neta').value = '$'+total;
+		}
 	</script>
 	
-<body onload="loadItems();">
+</head>
+	
+<body onload="loadEgresos();loadIngresos();restar();">
 	<div id="page" class="container article" id="wrap">
 		<div class="search-bar" style="width: auto; text-align: right;">
-		{% if error %}
-		    <p style="color: red;">No existen ordenes de compra con ese criterio</p>
-		{% endif %}
 		
 		<form action="" method="post" style="padding-bottom:30px;">
 			{% csrf_token %}
 			<a class="btn btn-primary" href="../index/#contable" style="float: left;"><span class="fui-arrow-left"></span>Inicio</a>
-	          <!--<input type="text" name="query" value="{{ query }}" placeholder="Buscar" class="span3" />
-	        <a class="btn btn-primary" href="/busquedaClientes/"><span class="fui-search"></span>Buscar</a>-->
 	    </form>
-	    
-	    <!--{% block buscar%}{% endblock%}
-	    <form action="" method="post">
-			{% csrf_token %}    
-		    	<div class="field">
-		            {{ form.query.errors }}
-		            <label for="id_query">Buscar:</label>
-		            {{ form.query }}
-		        </div>
-		        <input type="submit" class="btn btn-primary" value="Buscar">
-		</form>-->
 		<br>
-        <a class="btn btn-primary btn-nuevo" href="../nuevoGasto/"><span class="fui-plus"></span> Estado de P&eacuterdidas y Gan&aacutencias</a>
-        <br>
+		<h3>Estado Perdidas y Ganancias</h3>
+		<br>
 		<div class="conatiner">
-			<table id="sum_ingresos">
+			<table>
 				<thead>
 					<tr>
-						<th>Ingresos</th><th></th><th>Valor</th>
+						<th>Ingresos</th><th>Valor</th>
 					</tr>
 				</thead>
+				<tbody id="items0">
+				</tbody>
+				
+			</table>
+			
+			
+			<table id="sum_ingresos">
 				<tbody id="ingresos">
 				<tr>
                      <td>Total de Ingresos</td>
@@ -180,12 +153,19 @@ $('#sum_egresos tr.dato').each(function(){
 			</table>
 		
 		<div class="conatiner">
-			<table id="sum_egresos">
+		
+			<table>
 				<thead>
 					<tr>
-						<th>Egresos</th><th></th><th>Valor</th>
+						<th>Egresos</th><th>Valor</th>
 					</tr>
 				</thead>
+				<tbody id="items1">
+				</tbody>
+				
+			</table>
+		
+			<table id="sum_egresos">
 				<tbody id="egresos">
 				<tr>
                      <td>Total de Egresos</td>
@@ -205,20 +185,10 @@ $('#sum_egresos tr.dato').each(function(){
 					</tr>
 				</thead>
 				<tbody>
-				   
+				   		<td><input type="text" id="rentabilida_neta" value="" name="total" /></td>
 				</tbody>
 				
 			</table>
 		</div>
-	
-
-		<div id="pop-up">
-			Desea Eliminar este Gasto
-			<hr/>
-            <div style="background-color:white;">
-			    <a class="btn btn-large btn-success" id="btn-eliminar" href="#">Si</a>
-			    <a class="btn btn-large btn-primary" href="#" onclick="ocultarPopup();">No</a>
-		    </div>
-        </div>
 </body>
 </html>

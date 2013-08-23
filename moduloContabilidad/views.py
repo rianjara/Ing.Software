@@ -1,8 +1,8 @@
 # Create your views here.
 
 from moduloContabilidad.models import Gastos,Cuentas_x_pagar
-from moduloInventario.models import Orden_Compra
-from moduloFacturacion.models import OrdenPedido
+from moduloInventario.models import Orden_Compra,Detalle_Orden_Compra
+from moduloFacturacion.models import OrdenPedido, Item_OrdenPedido_Cantidad
 from django.shortcuts import render_to_response, render
 from django.utils.datastructures import MultiValueDictKeyError
 from django import forms
@@ -20,7 +20,7 @@ def gastos(request):
 def ingresos_egresos(request):
     #Ingresos
     mes = datetime.now().month
-    list_ingresos = OrdenPedido.objects.filter(fecha_compra__month=mes)
+    list_ingresos = Item_OrdenPedido_Cantidad.objects.filter(orden_pedido__fecha_compra__month=mes)
     
     #Egresos
     mes = datetime.now().month
@@ -141,7 +141,14 @@ def cuentas_por_pagar(request):
     :template:`ContabilidadFrontEnd/cuentasporpagar.html`
 
     """
+    list_orden_compra = Detalle_Orden_Compra.objects.all()
+    
+    for i in list_orden_compra:
+        cuenta=Cuentas_x_pagar(Detalle_Orden_Compra=i,fecha_vencimiento="")
+       
+    
     list_cuentas_x_pagar = Cuentas_x_pagar.objects.all()  
+    
     return render_to_response('ContabilidadFrontEnd/cuentasporpagar.html',{'l_cuentasxpagar': list_cuentas_x_pagar}) 
 
 def editar_cuenta_x_pagar(request):
