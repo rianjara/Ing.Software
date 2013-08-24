@@ -47,6 +47,9 @@ TIPO_PAGO_CHOICES = (('EFECTIVO', 'Efectivo'),
                   ,)
 
 class OrdenPedido(models.Model):
+    """
+    Genera un modelo para registrar las ordenes de pedido a facturar
+    """
     codigo = models.CharField(primary_key=True,max_length=10, unique=True)
     codigo_factura = models.CharField(null=True, max_length=20)
     fecha_compra = models.DateField()
@@ -59,6 +62,9 @@ class OrdenPedido(models.Model):
         return '%s'% (self.codigo)
     
     class Meta:
+        """
+        Esta tabla es ordenada en base a su fecha de facturacion
+        """
         db_table = 'Orden_Pedido'
         ordering = ['fecha_compra']
         
@@ -66,6 +72,10 @@ class OrdenPedido(models.Model):
         pass
         
 class Item_OrdenPedido_Cantidad(models.Model):
+    """
+    Modelo que representa la relacion de muchos a muchos entre los :model:`moduloFacturacion.OrdenPedido`
+    y :model:`moduloInventario.Item`
+    """
     orden_pedido = models.ForeignKey(OrdenPedido)
     item = models.ForeignKey(Item)
     cantidad = models.IntegerField()

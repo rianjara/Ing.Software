@@ -16,14 +16,50 @@ import decimal
 
 
 def ventas(request):
+    """
+    Muestra la lista de las ordenes de pedido que han sido facturadas en orden cronologico
+    **Context**
+    ``l_ordenes``
+        lista de ordenes de pedido facturada
+        
+    **Tempalte:**
+    
+    :template:`FacturacionFrontEnd/ordenesPedido.html`
+    """
     list_ventas = OrdenPedido.objects.exclude(codigo_factura__isnull=True)
     return render_to_response('FacturacionFrontEnd/ordenesPedido.html',{'l_ordenes': list_ventas})
 
 def ordenes_pedido(request):
+    """
+    Muestra la lista de todas las ordenes de pedido que han sido emitidas
+    **Context**
+    ``l_ordenes``
+        lista de ordenes de pedido
+        
+    **Tempalte:**
+    
+    :template:`FacturacionFrontEnd/ordenesPedido.html`
+    """
     list_ordenes = OrdenPedido.objects.all()
     return render_to_response('FacturacionFrontEnd/ordenesPedido.html',{'l_ordenes': list_ordenes})
 
 def nueva_orden_pedido(request):
+    """
+    Crea una nueva orden de pedido a partir de un formulario
+    
+    **Context**
+    ``RequestContext``
+    
+    ``orden_form``
+        infromacion de la orden de pedido
+    
+    ``formset``
+        lista de items asociados a la orden de pedido con su repsectiva cantidad
+        
+    **Tempalte:**
+    
+    :template:`FacturacionFrontEnd/formOrdenDePedido.html`
+    """
     fset=models.BaseInlineFormSet
     OrdenFormSet = inlineformset_factory(OrdenPedido,Item_OrdenPedido_Cantidad,ItemCantidadForm,fset,can_delete=False,extra=10,max_num=9)
     formset = OrdenFormSet()
@@ -52,7 +88,12 @@ def nueva_orden_pedido(request):
     return render(request, 'FacturacionFrontEnd/formOrdenDePedido.html', {'orden_form': orden_form, 'formset':formset})
 
 def save_item_cantidad(codigo,item,cantidad,precio_unitario):
-    #update_item
+    """
+    Almacena cada item con su repsectiva cantidad
+    
+    **Context**
+    ``RequestContext``
+    """
     item1 = Item.objects.filter(codigo=item)[0]
     item1.cantidad = int(item1.cantidad)- int(cantidad)
     item1.save()
@@ -75,6 +116,9 @@ def save_items_x_cantidad_in_orden(request):
               request.POST['%s-precio_venta_unitario'%prefix])
 
 def get_valor_total_orden_pedido(orden_id):
+    """
+    retorna el valor total de la orden de pedido
+    """
     item_orden1 = Item_OrdenPedido_Cantidad.objects.filter(orden_pedido=orden_id)
     sum = 0
     for i in item_orden1:
@@ -83,6 +127,22 @@ def get_valor_total_orden_pedido(orden_id):
         
 
 def editar_orden_pedido(request):
+    """
+    Permite editar y guardar una orden de pedido existente par aefectos de facturacion
+    
+    **Context**
+    ``RequestContext``
+    
+    ``orden_form``
+        infromacion de la orden de pedido
+    
+    ``formset``
+        lista de items asociados a la orden de pedido con su repsectiva cantidad
+        
+    **Tempalte:**
+    
+    :template:`FacturacionFrontEnd/formOrdenDePedido.html`
+    """
     fset=models.BaseInlineFormSet
     OrdenFormSet = inlineformset_factory(OrdenPedido,Item_OrdenPedido_Cantidad,ItemCantidadForm,fset,can_delete=False,extra=10,max_num=9)
     formset = OrdenFormSet()
@@ -125,14 +185,41 @@ def editar_orden_pedido(request):
     return render(request, 'FacturacionFrontEnd/formOrdenDePedido.html', {'orden_form': orden_form, 'formset':formset})
 
 def abonos(request):
+    """
+    Muestra la lista de los abonos realizados a una orden de pedido en epecifico
+    
+    **Context**
+    ``l_abonos``
+        lista de abonos realizados
+        
+    **Tempalte:**
+    
+    :template:`FacturacionFrontEnd/abonos.html`
+    """
     list_abonos = Abono.objects.all()
     return render_to_response('FacturacionFrontEnd/abonos.html',{'l_abonos': list_abonos})
 
 def validate_monto(monto):
+    """
+    Valida si el monto del abono a ingresar es mayor a cero
+    """
     if monto < 0:
         raise ValidationError('El %s debe ser mayor a cero'% monto)
 
 def nuevo_abono(request):
+    """
+    Registra un nuevo abono
+    
+    **Context**
+    ``RequestContext``
+    
+    ``form``
+        infromacion del abono a registrar
+        
+    **Tempalte:**
+    
+    :template:`FacturacionFrontEnd/nuevoAbono.html`
+    """
     if request.method == 'POST':
         form = AbonoForm(request.POST)
         if form.is_valid():
@@ -153,7 +240,9 @@ def nuevo_abono(request):
        
 
 class AbonoForm(forms.ModelForm):
-    
+    """
+    Formulario que permite registrar un nuevo abono
+    """
     TIPO_PAGO_CHOICES = (('EFECTIVO', 'Efectivo'),
                  ('CHEQUE', (('PCF','Banco Pacifico'),
                           ('PCH','Banco de Pichincha'),
@@ -208,6 +297,9 @@ class AbonoForm(forms.ModelForm):
         fields = ('fecha','orden_pedido','tipo_pago','monto')
 
 class ItemCantidadForm(forms.ModelForm):
+    """
+    Representa el item, la cantidad, y el precio unitario de este que se registrara en la orden de pedido
+    """
     subtotal = forms.DecimalField()
     class Meta:
         model = Item_OrdenPedido_Cantidad
@@ -229,6 +321,9 @@ class ItemCantidadForm(forms.ModelForm):
         self.fields['item'].widget = widgets.TextInput(attrs={'class': 'autocomplete-me'})
 
 class OrdenPedidoForm(forms.ModelForm):
+    """
+    Formulario que permite registrar una nueva orden de pedido
+    """
     codigo = forms.CharField(max_length=10)  
     codigo_factura = forms.CharField(max_length=10)  
     detalle = forms.CharField( required = False,widget=forms.Textarea(attrs={'cols':'100','rows':'4'}) )

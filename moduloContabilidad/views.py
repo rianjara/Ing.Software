@@ -13,11 +13,43 @@ from datetime import datetime, date
 
 
 def gastos(request):
+    """
+    Muestra los gastos efectuados hasta esa fecha
+
+    **Context**
+
+    ``RequestContext``
+
+    ``Gastos``
+        Objetos de :model:`moduloContabilidad.Gastos`.
+
+    **Template:**
+
+    :template:`ContabilidadFrontEnd/gastos.html`
+
+    """
     list_gastos = Gastos.objects.all()
     usuario = request.user 
     return render_to_response('ContabilidadFrontEnd/gastos.html',{'l_gastos': list_gastos, 'user': usuario})
 
 def ingresos_egresos(request):
+    """
+    Extrae los ingresos y egresos efectuados en el mes en curso
+    
+    **Context**
+    
+    ``RequestContext``
+    
+    ``OrdenPedido``
+        Objetos de :model:`moduloFacturacion.OrdenPedido`.
+    
+    ``Orden_Compra``
+        Objetos de :model:`moduloInventario.Orden_Compra`.
+
+    **Template:**
+
+    :template:`ContabilidadFrontEnd/estadoPerdidasyGanancias.html`
+    """
     #Ingresos
     mes = datetime.now().month
     list_ingresos = Item_OrdenPedido_Cantidad.objects.filter(orden_pedido__fecha_compra__month=mes)

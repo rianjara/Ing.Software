@@ -369,6 +369,10 @@ class ClienteForm(forms.ModelForm):
         model = Cliente
 
 def validate_cilindro(value):
+    """
+    Valida que el cilindro no pueda ser un numero negativo
+        
+    """ 
     if value > 0:
         raise ValidationError('%s debe ser un numero negativo'% value)
     

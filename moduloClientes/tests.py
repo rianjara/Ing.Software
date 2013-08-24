@@ -79,7 +79,7 @@ class SimpleTest(TestCase):
                                               direccion='19 E/ Maldonado y Calicuchima',
                                               e_mail1='aniavasq@gmail.com',
                                               e_mail2='aniavasq@espol.edu.ec',
-                                              ruc='0929791648001'), 'Creación de cliente exitosa')
+                                              ruc='0929791648001'), 'Creacion de cliente exitosa')
     
     #-----------------------------------------------------------------------------------------------------------------------------
     
@@ -101,8 +101,8 @@ class SimpleTest(TestCase):
                                         vista='CERCA',
                                         ojo='DERECHO',
                                         estado='PENDIENTE')
-                         ,'Tipo de datos inválido...' )
-    #valores de eje ingresado de forma errónea
+                         ,'Tipo de datos invalido...' )
+    #valores de eje ingresado de forma erronea
          
     def tc_consulta_p002(self):
         self.assertEqual(
@@ -155,4 +155,4 @@ class SimpleTest(TestCase):
                                         vista='CERCA',
                                         ojo='DERECHO',
                                         estado='PENDIENTE')
-                     ,'La consulta se creó con éxito..' )
+                     ,'La consulta se creo con exito..' )
